@@ -107,6 +107,47 @@ function openCreateDialog() {
   selectedProduct.value = null;
   productDialog.value = true;
 }
+async function saveProduct() {
+  const validation = await productForm.value?.validate();
+  if (validation && !validation.valid) return;
+  saving.value = true;
+  try {
+    if (isEditing.value) {
+      await updateProduct();
+    } else {
+      await createProduct();
+    }
+    closeProductDialog();
+    await getProducts();
+  } catch (error) {
+    console.error("Error saving product:", error);
+    showSnackbar(getErrorMessage(error), "error");
+  } finally {
+    saving.value = false;
+  }
+}
+
+function openDeleteDialog(product) {
+  selectedProduct.value = product;
+  deleteDialog.value = true;
+}
+async function deleteProduct() {
+  if (!selectedProduct.value) return;
+  deleting.value = true;
+  try {
+    await $fetch(
+      `${STRAPI_URL}/api/products/${selectedProduct.value.documentId}`,
+      { method: "DELETE" },
+    );
+    deleteDialog.value = false;
+    showSnackbar("Product deleted successfully.", "success");
+    await getProducts();
+  } catch (error) {
+    showSnackbar(getErrorMessage(error), "error");
+  } finally {
+    deleting.value = false;
+  }
+}
 
 async function createProduct() {
   const response = await $fetch(`${STRAPI_URL}/api/products`, {
@@ -127,6 +168,31 @@ async function createProduct() {
   }
   showSnackbar("Product created successfully.", "success");
 }
+
+async function updateProduct() {
+  if (!selectedProduct.value) return;
+  const response = await $fetch(
+    `${STRAPI_URL}/api/products/${selectedProduct.value.documentId}`,
+    {
+      method: "PUT",
+      body: {
+        data: {
+          name: form.name,
+          description: form.description,
+          price: Number(form.price),
+          stock: Number(form.stock),
+          category: form.category,
+          is_active: form.is_active,
+        },
+      },
+    },
+  );
+  if (selectedFile.value && response.data) {
+    await uploadProductImage(response.data.id);
+  }
+  showSnackbar("Product updated successfully.", "success");
+}
+
 async function uploadProductImage(productId) {
   const file = getSelectedFile();
   if (!file) return;
@@ -139,6 +205,75 @@ async function uploadProductImage(productId) {
     method: "POST",
     body: formData,
   });
+}
+function handleImageChange(value) {
+  const file = getFileFromValue(value);
+  if (!file) {
+    imagePreview.value = null;
+    return;
+  }
+  if (imagePreview.value) {
+    URL.revokeObjectURL(imagePreview.value);
+  }
+  imagePreview.value = URL.createObjectURL(file);
+}
+function getSelectedFile() {
+  return getFileFromValue(selectedFile.value);
+}
+function getFileFromValue(value) {
+  if (!value) return null;
+  if (value instanceof File) return value;
+  if (Array.isArray(value) && value.length > 0) return value[0];
+  return null;
+}
+function openEditDialog(product) {
+  selectedProduct.value = product;
+  isEditing.value = true;
+  form.name = product.name || "";
+  form.description = product.description || "";
+  form.price = Number(product.price) || 0;
+  form.stock = Number(product.stock) || 0;
+  form.category = product.category || "";
+  form.is_active = product.is_active ?? true;
+  currentImage.value = product.image || null;
+  selectedFile.value = null;
+  imagePreview.value = null;
+  productDialog.value = true;
+}
+function viewProduct(product) {
+  selectedProduct.value = product;
+  viewDialog.value = true;
+}
+function showSnackbar(message, color = "success") {
+  snackbar.message = message;
+  snackbar.color = color;
+  snackbar.show = true;
+}
+function getErrorMessage(error) {
+  return (
+    error?.data?.error?.message ||
+    error?.data?.message ||
+    error?.message ||
+    "Something went wrong."
+  );
+}
+function resetForm() {
+  form.name = "";
+  form.description = "";
+  form.price = 0;
+  form.stock = 0;
+  form.category = "";
+  form.is_active = true;
+  selectedFile.value = null;
+  currentImage.value = null;
+  if (imagePreview.value) {
+    URL.revokeObjectURL(imagePreview.value);
+  }
+  imagePreview.value = null;
+}
+function closeProductDialog() {
+  productDialog.value = false;
+  resetForm();
 }
 </script>
 <template>
@@ -280,6 +415,102 @@ async function uploadProductImage(productId) {
         </tbody>
       </v-table>
     </v-card>
+    <v-dialog v-model="deleteDialog" max-width="450">
+      <v-card rounded="xl">
+        <v-card-text class="text-center pa-8">
+          <v-icon icon="mdi-delete-alert" size="60" color="error" />
+          <h2 class="text-h5 font-weight-bold mt-3">Delete Product?</h2>
+          <p class="text-medium-emphasis mt-3">
+            Are you sure you want to delete
+            <strong>{{ selectedProduct?.name }}</strong
+            >?
+          </p>
+        </v-card-text>
+        <v-card-actions class="pa-5 pt-0">
+          <v-btn variant="text" block @click="deleteDialog = false"
+            >Cancel</v-btn
+          >
+          <!-- ========================================
+VIEW PRODUCT DIALOG
+========================================= -->
+          <v-dialog v-model="viewDialog" max-width="600">
+            <v-card v-if="selectedProduct" rounded="xl">
+              <!-- PRODUCT IMAGE -->
+              <v-img
+                v-if="selectedProduct.image"
+                :src="getImageUrl(selectedProduct.image)"
+                height="320"
+                contain
+                class="product-view-image"
+              />
+              <!-- NO IMAGE PLACEHOLDER -->
+              <div
+                v-else
+                class="d-flex align-center justify-center bg-grey-lighten-3"
+                style="height: 250px"
+              >
+                <v-icon icon="mdi-image-off" size="80" color="grey" />
+              </div>
+              <!-- PRODUCT INFORMATION -->
+              <v-card-text class="pa-6">
+                <div class="d-flex align-start justify-space-between ga-4">
+                  <div>
+                    <h2 class="text-h5 font-weight-bold">
+                      {{ selectedProduct.name }}
+                    </h2>
+                    <v-chip
+                      class="mt-2"
+                      color="primary"
+                      variant="tonal"
+                      size="small"
+                    >
+                      {{ selectedProduct.category || "Uncategorized" }}
+                    </v-chip>
+                  </div>
+                  <v-chip
+                    :color="selectedProduct.is_active ? 'success' : 'error'"
+                    variant="tonal"
+                  >
+                    {{ selectedProduct.is_active ? "Active" : "Inactive" }}
+                  </v-chip>
+                </div>
+                <p class="mt-5 text-medium-emphasis">
+                  {{ selectedProduct.description || "No product description." }}
+                </p>
+                <v-divider class="my-5" />
+                <v-row>
+                  <v-col cols="6">
+                    <div class="text-caption text-medium-emphasis">Price</div>
+                    <div class="text-h5 font-weight-bold text-primary">
+                      {{ formatPrice(selectedProduct.price) }}
+                    </div>
+                  </v-col>
+                  <v-col cols="6">
+                    <div class="text-caption text-medium-emphasis">Stock</div>
+                    <div class="text-h6 font-weight-bold">
+                      {{ selectedProduct.stock }} units
+                    </div>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-card-actions class="pa-5 pt-0">
+                <v-spacer />
+                <v-btn
+                  color="primary"
+                  variant="tonal"
+                  @click="viewDialog = false"
+                >
+                  Close
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+          <v-btn color="error" block :loading="deleting" @click="deleteProduct">
+            Delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-main class="product-page">
       <v-dialog v-model="productDialog" max-width="700" persistent>
         <v-card rounded="xl">
@@ -393,3 +624,39 @@ async function uploadProductImage(productId) {
     </v-main>
   </v-layout>
 </template>
+<style scoped>
+.product-layout {
+  min-height: 100vh;
+}
+.product-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+}
+.shop-header {
+  background: #ffffff !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+.logo-link {
+  text-decoration: none;
+  white-space: nowrap;
+}
+.product-table-card {
+  overflow-x: auto;
+}
+.description-text {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+}
+.image-preview {
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  background: #f5f5f5;
+}
+.product-view-image {
+  background: #f8f9fa;
+}
+</style>

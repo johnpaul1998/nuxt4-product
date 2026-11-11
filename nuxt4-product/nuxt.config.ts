@@ -7,5 +7,8 @@ export default defineNuxtConfig({
       strapiUrl: 'http://localhost:1337',
       },
     },
+     modules: [
+    'vuetify-nuxt-module'
+  ]
 })
 
