@@ -1,739 +1,653 @@
-<!-- app/pages/products.vue -->
 <template>
-  <!-- Vuetify interface goes here -->
-  <v-layout class="product-layout">
-    <v-app-bar flat height="76" class="shop-header">
+  <v-container fluid class="pa-0">
+    <!-- NAVIGATION BAR -->
+    <v-app-bar color="white" elevation="1" height="75">
       <v-container class="d-flex align-center">
-        <NuxtLink to="/" class="logo-link d-flex align-center ga-2">
-          <v-icon icon="mdi-cart" color="primary" size="38" />
-          <span class="text-h5 font-weight-bold text-black">
-            Shop<span class="text-primary">Kart</span>
-          </span>
-        </NuxtLink>
+        <v-toolbar-title class="font-weight-bold text-primary">
+          ShopKart
+        </v-toolbar-title>
+
         <v-spacer />
 
-        <v-btn to="/" variant="text" prepend-icon="mdi-home-outline">
-          Home
-        </v-btn>
-        <v-btn
-          color="primary"
-          variant="tonal"
-          prepend-icon="mdi-package-variant"
+        <v-btn to="/" variant="text" color="primary"> Home </v-btn>
+
+        <v-btn to="/products" variant="text"> Products </v-btn>
+
+        <!-- CART ICON -->
+        <v-badge
+          :content="cartItemCount"
+          :model-value="cartItemCount > 0"
+          color="error"
+          floating
         >
-          Manage Products
-        </v-btn>
+          <v-btn icon variant="text" @click="cartDrawer = true">
+            <v-icon size="28">mdi-cart-outline</v-icon>
+          </v-btn>
+        </v-badge>
       </v-container>
     </v-app-bar>
-    <v-main class="product-page">
-      <v-container class="py-8">
-        <!-- Product page heading and actions -->
-        <div
-          class="d-flex flex-wrap align-center justify-space-between ga-4 mb-6"
-        >
-          <div>
-            <h1 class="text-h4 font-weight-bold">Product Management</h1>
-            <p class="text-medium-emphasis mt-1 mb-0">
-              Manage your e-commerce products
-            </p>
-          </div>
-          <v-btn
-            color="primary"
-            prepend-icon="mdi-plus"
-            size="large"
-            @click="openCreateDialog"
-          >
-            Add Product
-          </v-btn>
-        </div>
-        <!-- Product search -->
-        <v-card class="mb-6" rounded="lg" elevation="1">
-          <v-card-text>
-            <v-text-field
-              v-model="search"
-              label="Search product"
-              prepend-inner-icon="mdi-magnify"
-              variant="outlined"
-              density="comfortable"
-              clearable
-              hide-details
-            />
-          </v-card-text>
-        </v-card>
-        <div v-if="loading" class="text-center py-16">
-          <v-progress-circular indeterminate color="primary" size="50" />
-          <div class="mt-4 text-medium-emphasis">Loading products...</div>
-        </div>
 
+    <!-- CART SIDE DRAWER -->
+    <v-navigation-drawer
+      v-model="cartDrawer"
+      location="right"
+      temporary
+      width="400"
+      class="cart-drawer"
+    >
+      <div class="d-flex align-center justify-space-between pa-4">
+        <h2 class="text-h5 font-weight-bold">Your Cart</h2>
+
+        <v-btn icon="mdi-close" variant="text" @click="cartDrawer = false" />
+      </div>
+
+      <v-divider />
+
+      <!-- EMPTY CART -->
+      <div v-if="cart.length === 0" class="text-center pa-8">
+        <v-icon size="75" color="grey-lighten-1"> mdi-cart-outline </v-icon>
+
+        <h3 class="mt-4">Your cart is empty</h3>
+
+        <p class="text-medium-emphasis mt-2">
+          Add some products to get started!
+        </p>
+      </div>
+
+      <!-- CART ITEMS -->
+      <div v-else class="pa-4">
         <v-card
-          v-else-if="filteredProducts.length === 0"
-          rounded="lg"
-          elevation="1"
+          v-for="item in cart"
+          :key="item.documentId"
+          variant="outlined"
+          class="mb-3"
         >
-          <v-card-text class="text-center py-16">
-            <v-icon icon="mdi-package-variant" size="64" color="grey" />
-            <h3 class="mt-4">No Products Found</h3>
-            <p class="text-medium-emphasis mt-2">
-              Add your first product or try another search.
-            </p>
-          </v-card-text>
-        </v-card>
-        <v-card v-else rounded="lg" elevation="1" class="product-table-card">
-          <v-table>
-            <thead>
-              <tr>
-                <th>Image</th>
-                <th>Name</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Status</th>
-                <th class="text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="product in filteredProducts" :key="product.documentId">
-                <td>
-                  <v-avatar rounded="lg" size="70" class="my-2">
-                    <v-img
-                      v-if="product.image"
-                      :src="getImageUrl(product.image)"
-                      :alt="product.name"
-                      cover
-                    />
-                    <v-icon v-else icon="mdi-image-off" color="grey" />
-                  </v-avatar>
-                </td>
-                <td>
-                  <div class="font-weight-bold">{{ product.name }}</div>
-                  <div class="description-text text-medium-emphasis">
-                    {{ product.description || "No description" }}
-                  </div>
-                </td>
-                <td>
-                  <v-chip color="primary" variant="tonal" size="small">
-                    {{ product.category || "Uncategorized" }}
-                  </v-chip>
-                </td>
-                <td class="font-weight-bold">
-                  {{ formatPrice(product.price) }}
-                </td>
-                <td>
-                  <v-chip
-                    :color="getStockColor(product.stock)"
-                    variant="tonal"
-                    size="small"
-                  >
-                    {{ product.stock }}
-                  </v-chip>
-                </td>
-                <td>
-                  <v-chip
-                    :color="product.is_active ? 'success' : 'error'"
-                    variant="tonal"
-                    size="small"
-                  >
-                    {{ product.is_active ? "Active" : "Inactive" }}
-                  </v-chip>
-                </td>
-                <td>
-                  <div class="d-flex justify-center ga-1">
-                    <v-btn
-                      icon="mdi-eye"
-                      variant="text"
-                      color="info"
-                      size="small"
-                      @click="viewProduct(product)"
-                    />
-                    <v-btn
-                      icon="mdi-pencil"
-                      variant="text"
-                      color="primary"
-                      size="small"
-                      @click="openEditDialog(product)"
-                    />
-                    <v-btn
-                      icon="mdi-delete"
-                      variant="text"
-                      color="error"
-                      size="small"
-                      @click="openDeleteDialog(product)"
-                    />
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </v-table>
-        </v-card>
-      </v-container>
-      <v-dialog v-model="productDialog" max-width="700" persistent>
-        <v-card rounded="xl">
-          <v-card-title class="d-flex align-center justify-space-between pa-5">
-            <span class="text-h5 font-weight-bold">
-              {{ isEditing ? "Edit Product" : "Add Product" }}
-            </span>
-            <v-btn
-              icon="mdi-close"
-              variant="text"
-              @click="closeProductDialog"
-            />
-          </v-card-title>
-          <v-divider />
-          <v-card-text class="pa-6">
-            <v-form ref="productForm" @submit.prevent="saveProduct">
-              <div
-                v-if="imagePreview || currentImage"
-                class="image-preview mb-4"
-              >
+          <v-card-text>
+            <v-row align="center">
+              <v-col cols="4">
                 <v-img
-                  :src="imagePreview || getImageUrl(currentImage)"
-                  height="220"
-                  contain
-                />
-              </div>
-              <v-file-input
-                v-model="selectedFile"
-                label="Select Product Image"
-                variant="outlined"
-                accept="image/*"
-                @update:model-value="handleImageChange"
-              />
-              <v-text-field
-                v-model="form.name"
-                label="Product Name"
-                variant="outlined"
-                :rules="[
-                  (value) => !!value?.trim() || 'Product name is required',
-                ]"
-              />
-              <v-textarea
-                v-model="form.description"
-                label="Description"
-                variant="outlined"
-                rows="3"
-              />
-              <v-row>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="form.price"
-                    label="Price"
-                    type="number"
-                    variant="outlined"
-                    :rules="priceRules"
-                  />
-                </v-col>
-                <v-col cols="12" md="6">
-                  <v-text-field
-                    v-model.number="form.stock"
-                    label="Stock"
-                    type="number"
-                    variant="outlined"
-                    :rules="stockRules"
-                  />
-                </v-col>
-              </v-row>
-              <v-select
-                v-model="form.category"
-                :items="categories"
-                label="Category"
-                variant="outlined"
-              />
-              <v-switch
-                v-model="form.is_active"
-                label="Active Product"
-                color="success"
-                inset
-              />
-            </v-form>
-          </v-card-text>
-          <v-divider />
-          <v-card-actions class="pa-5">
-            <v-spacer />
-            <v-btn variant="text" @click="closeProductDialog">Cancel</v-btn>
-            <v-btn color="primary" :loading="saving" @click="saveProduct">
-              {{ isEditing ? "Update Product" : "Save Product" }}
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <v-dialog v-model="deleteDialog" max-width="450">
-        <v-card rounded="xl">
-          <v-card-text class="text-center pa-8">
-            <v-icon icon="mdi-delete-alert" size="60" color="error" />
-            <h2 class="text-h5 font-weight-bold mt-3">Delete Product?</h2>
-            <p class="text-medium-emphasis mt-3">
-              Are you sure you want to delete
-              <strong>{{ selectedProduct?.name }}</strong
-              >?
-            </p>
-          </v-card-text>
-          <v-card-actions class="pa-5 pt-0">
-            <v-btn variant="text" block @click="deleteDialog = false"
-              >Cancel</v-btn
-            >
-            <v-btn
-              color="error"
-              block
-              :loading="deleting"
-              @click="deleteProduct"
-            >
-              Delete
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
-      <!-- ========================================
-VIEW PRODUCT DIALOG
-========================================= -->
-      <v-dialog v-model="viewDialog" max-width="600">
-        <v-card v-if="selectedProduct" rounded="xl">
-          <!-- PRODUCT IMAGE -->
-          <v-img
-            v-if="selectedProduct.image"
-            :src="getImageUrl(selectedProduct.image)"
-            height="320"
-            contain
-            class="product-view-image"
-          />
-          <!-- NO IMAGE PLACEHOLDER -->
-          <div
-            v-else
-            class="d-flex align-center justify-center bg-grey-lighten-3"
-            style="height: 250px"
-          >
-            <v-icon icon="mdi-image-off" size="80" color="grey" />
-          </div>
-          <!-- PRODUCT INFORMATION -->
-          <v-card-text class="pa-6">
-            <div class="d-flex align-start justify-space-between ga-4">
-              <div>
-                <h2 class="text-h5 font-weight-bold">
-                  {{ selectedProduct.name }}
-                </h2>
-                <v-chip
-                  class="mt-2"
-                  color="primary"
-                  variant="tonal"
-                  size="small"
+                  :src="getImageUrl(item.image) || undefined"
+                  height="85"
+                  cover
+                  class="rounded"
                 >
-                  {{ selectedProduct.category || "Uncategorized" }}
-                </v-chip>
-              </div>
-              <v-chip
-                :color="selectedProduct.is_active ? 'success' : 'error'"
-                variant="tonal"
-              >
-                {{ selectedProduct.is_active ? "Active" : "Inactive" }}
-              </v-chip>
-            </div>
-            <p class="mt-5 text-medium-emphasis">
-              {{ selectedProduct.description || "No product description." }}
-            </p>
-            <v-divider class="my-5" />
-            <v-row>
-              <v-col cols="6">
-                <div class="text-caption text-medium-emphasis">Price</div>
-                <div class="text-h5 font-weight-bold text-primary">
-                  {{ formatPrice(selectedProduct.price) }}
-                </div>
+                  <template #placeholder>
+                    <div class="image-placeholder">
+                      <v-icon>mdi-image-outline</v-icon>
+                    </div>
+                  </template>
+                </v-img>
               </v-col>
-              <v-col cols="6">
-                <div class="text-caption text-medium-emphasis">Stock</div>
-                <div class="text-h6 font-weight-bold">
-                  {{ selectedProduct.stock }} units
+
+              <v-col cols="8">
+                <div class="d-flex justify-space-between">
+                  <strong>{{ item.name }}</strong>
+
+                  <v-btn
+                    icon="mdi-delete-outline"
+                    color="error"
+                    size="small"
+                    variant="text"
+                    @click="removeFromCart(item.documentId)"
+                  />
+                </div>
+
+                <p class="text-body-2 mt-1">
+                  Subtotal:
+                  <strong class="text-primary">
+                    {{ formatPrice(item.price * item.quantity) }}
+                  </strong>
+                </p>
+                <div class="d-flex align-center mt-2">
+                  <v-btn
+                    icon="mdi-minus"
+                    size="x-small"
+                    variant="outlined"
+                    :disabled="item.quantity <= 1"
+                    @click="decreaseQuantity(item.documentId)"
+                  />
+
+                  <span class="mx-3 font-weight-bold">
+                    {{ item.quantity }}
+                  </span>
+
+                  <v-btn
+                    icon="mdi-plus"
+                    size="x-small"
+                    variant="outlined"
+                    :disabled="item.quantity >= item.stock"
+                    @click="increaseQuantity(item.documentId)"
+                  />
                 </div>
               </v-col>
             </v-row>
           </v-card-text>
-          <v-card-actions class="pa-5 pt-0">
-            <v-spacer />
-            <v-btn color="primary" variant="tonal" @click="viewDialog = false">
-              Close
-            </v-btn>
-          </v-card-actions>
         </v-card>
-      </v-dialog>
-      <v-snackbar
-        v-model="snackbar.show"
-        :color="snackbar.color"
-        :timeout="3000"
-        location="top end"
+
+        <v-divider class="my-4" />
+
+        <!-- CART TOTAL -->
+        <div class="d-flex justify-space-between mb-2">
+          <span>Items</span>
+          <strong>{{ cartItemCount }}</strong>
+        </div>
+
+        <div class="d-flex justify-space-between mb-4">
+          <span class="text-h6 font-weight-bold">Subtotal</span>
+
+          <span class="text-h6 font-weight-bold text-primary">
+            {{ formatPrice(cartTotal) }}
+          </span>
+        </div>
+
+        <v-btn
+          color="error"
+          variant="outlined"
+          block
+          class="mb-3"
+          @click="clearCart"
+        >
+          Clear Cart
+        </v-btn>
+
+        <v-btn color="primary" block size="large" disabled>
+          Proceed to Checkout
+        </v-btn>
+
+        <p class="text-caption text-center mt-2 text-medium-emphasis">
+          Checkout will be available in a future update.
+        </p>
+      </div>
+    </v-navigation-drawer>
+
+    <!-- HERO SECTION -->
+    <section class="hero-section">
+      <v-container class="py-16">
+        <v-row align="center">
+          <v-col cols="12" md="7">
+            <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
+              Discover Your Next Favorite Product
+            </h1>
+
+            <p class="text-h6 mb-6">
+              Find quality products at affordable prices. Shopping made simple
+              with ShopKart.
+            </p>
+
+            <v-btn
+              to="/products"
+              color="white"
+              variant="flat"
+              size="large"
+              rounded="lg"
+            >
+              Shop Now
+              <v-icon end>mdi-arrow-right</v-icon>
+            </v-btn>
+          </v-col>
+
+          <v-col cols="12" md="5" class="text-center">
+            <v-icon size="180" color="white"> mdi-shopping </v-icon>
+          </v-col>
+        </v-row>
+      </v-container>
+    </section>
+
+    <!-- SEARCH -->
+    <v-container class="py-8">
+      <v-text-field
+        v-model="searchQuery"
+        label="Search products..."
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        rounded="lg"
+        clearable
+        hide-details
+      />
+    </v-container>
+
+    <!-- CATEGORIES -->
+    <v-container>
+      <h2 class="text-h5 font-weight-bold mb-4">Shop by Category</h2>
+
+      <div class="d-flex flex-wrap ga-2 mb-8">
+        <v-chip
+          :color="selectedCategory === 'All' ? 'primary' : undefined"
+          :variant="selectedCategory === 'All' ? 'flat' : 'outlined'"
+          @click="selectedCategory = 'All'"
+        >
+          All
+        </v-chip>
+
+        <v-chip
+          v-for="category in categories"
+          :key="category"
+          :color="selectedCategory === category ? 'primary' : undefined"
+          :variant="selectedCategory === category ? 'flat' : 'outlined'"
+          @click="selectedCategory = category"
+        >
+          {{ category }}
+        </v-chip>
+      </div>
+    </v-container>
+
+    <!-- PROMOTIONS SECTION -->
+    <v-container class="pb-8">
+      <v-card rounded="xl" color="deep-purple-darken-2" class="pa-6 pa-md-10">
+        <v-row align="center">
+          <v-col cols="12" md="8">
+            <v-chip color="yellow" class="mb-4" size="small">
+              SPECIAL OFFER
+            </v-chip>
+
+            <h2 class="text-h4 font-weight-bold text-white mb-3">
+              Great Deals Await!
+            </h2>
+
+            <p class="text-body-1 text-white mb-5">
+              Discover amazing products and enjoy shopping with ShopKart.
+            </p>
+
+            <v-btn
+              to="/products"
+              color="yellow"
+              class="text-black"
+              rounded="lg"
+            >
+              Explore Products
+              <v-icon end>mdi-arrow-right</v-icon>
+            </v-btn>
+          </v-col>
+
+          <v-col cols="12" md="4" class="text-center">
+            <v-icon size="130" color="yellow"> mdi-tag-heart </v-icon>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-container>
+
+    <!-- FEATURED PRODUCTS -->
+    <v-container class="pb-12">
+      <div class="d-flex align-center justify-space-between mb-5">
+        <h2 class="text-h5 font-weight-bold">Featured Products</h2>
+
+        <v-btn to="/products" variant="text" color="primary">
+          View All
+          <v-icon end>mdi-arrow-right</v-icon>
+        </v-btn>
+      </div>
+
+      <div v-if="pending" class="text-center pa-10">
+        <v-progress-circular indeterminate color="primary" />
+        <p class="mt-3">Loading products...</p>
+      </div>
+
+      <v-alert v-else-if="error" type="warning" variant="tonal">
+        Unable to load products. Please check your Strapi connection.
+      </v-alert>
+
+      <v-alert
+        v-else-if="filteredProducts.length === 0"
+        type="info"
+        variant="tonal"
       >
-        {{ snackbar.message }}
-        <template #actions>
-          <v-btn variant="text" @click="snackbar.show = false"> Close </v-btn>
-        </template>
-      </v-snackbar>
-    </v-main>
-  </v-layout>
+        No products found.
+      </v-alert>
+
+      <v-row v-else>
+        <v-col
+          v-for="product in filteredProducts"
+          :key="product.documentId"
+          cols="12"
+          sm="6"
+          md="4"
+          lg="3"
+        >
+          <v-card rounded="lg" elevation="2" height="100%">
+            <div class="product-image-container">
+              <v-img
+                v-if="getImageUrl(product.image)"
+                :src="getImageUrl(product.image)"
+                height="200"
+                cover
+              />
+
+              <div v-else class="image-placeholder">
+                <v-icon size="65" color="grey"> mdi-image-outline </v-icon>
+              </div>
+
+              <!-- WISHLIST BUTTON -->
+              <v-btn
+                icon
+                size="small"
+                elevation="2"
+                class="wishlist-button"
+                :color="isWishlisted(product) ? 'red' : 'white'"
+                @click.stop="toggleWishlist(product)"
+              >
+                <v-icon :color="isWishlisted(product) ? 'white' : 'red'">
+                  {{
+                    isWishlisted(product) ? "mdi-heart" : "mdi-heart-outline"
+                  }}
+                </v-icon>
+              </v-btn>
+            </div>
+
+            <v-card-item>
+              <v-card-title class="text-subtitle-1 font-weight-bold">
+                {{ product.name }}
+              </v-card-title>
+
+              <v-card-subtitle>
+                {{ product.category || "General" }}
+              </v-card-subtitle>
+            </v-card-item>
+
+            <v-card-text>
+              <p class="text-body-2 text-medium-emphasis mb-3">
+                {{ product.description || "No description available." }}
+              </p>
+
+              <div class="d-flex align-center justify-space-between">
+                <span class="text-h6 font-weight-bold text-primary">
+                  {{ formatPrice(product.price) }}
+                </span>
+
+                <v-chip size="small" color="success" variant="tonal">
+                  {{ product.stock }} in stock
+                </v-chip>
+              </div>
+            </v-card-text>
+
+            <v-card-actions class="pa-4">
+              <v-btn
+                color="primary"
+                block
+                :disabled="product.stock <= 0"
+                @click="addToCart(product)"
+              >
+                <v-icon start>mdi-cart-plus</v-icon>
+                Add to Cart
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-container>
+
+    <!-- FOOTER -->
+    <v-footer color="grey-darken-4" class="text-white">
+      <v-container class="text-center py-6">
+        <h3 class="text-h5 font-weight-bold mb-2">ShopKart</h3>
+
+        <p class="text-body-2 text-grey-lighten-1">
+          Your simple and convenient online shopping destination.
+        </p>
+
+        <v-divider class="my-4" color="grey" />
+
+        <p class="text-caption">
+          © {{ new Date().getFullYear() }} ShopKart. All rights reserved.
+        </p>
+      </v-container>
+    </v-footer>
+
+    <!-- CART NOTIFICATION -->
+    <v-snackbar v-model="showCartMessage" color="success" timeout="2000">
+      {{ cartMessage }}
+    </v-snackbar>
+  </v-container>
 </template>
+
 <script setup lang="ts">
-// Nuxt / Vue state and functions go here
-// @ts-nocheck
-definePageMeta({
-  layout: false,
-});
-useHead({
-  title: "Product Management | ShopKart",
-});
+// STRAPI CONFIGURATION
 const config = useRuntimeConfig();
 const STRAPI_URL = config.public.strapiUrl;
-const products = ref([]);
-const loading = ref(false);
-const search = ref("");
-const productDialog = ref(false);
-const viewDialog = ref(false);
-const deleteDialog = ref(false);
-const selectedProduct = ref(null);
-const isEditing = ref(false);
-const saving = ref(false);
-const deleting = ref(false);
-const productForm = ref(null);
-const form = reactive({
-  name: "",
-  description: "",
-  price: 0,
-  stock: 0,
-  category: "",
-  is_active: true,
+
+// PRODUCT INTERFACE
+interface Product {
+  id: number;
+  documentId: string;
+  name: string;
+  description: string;
+  price: number;
+  stock: number;
+  category: string;
+  is_active: boolean;
+  image: any;
+}
+
+// CART INTERFACE
+interface CartItem extends Product {
+  quantity: number;
+}
+
+// SEARCH AND CATEGORY STATE
+const searchQuery = ref("");
+const selectedCategory = ref("All");
+
+// CART STATE
+const cartDrawer = ref(false);
+const cart = ref<CartItem[]>([]);
+
+// NOTIFICATION STATE
+const showCartMessage = ref(false);
+const cartMessage = ref("");
+
+// FETCH PRODUCTS FROM STRAPI
+const {
+  data: response,
+  pending,
+  error,
+} = await useFetch<{ data: Product[] }>(`${STRAPI_URL}/api/products`, {
+  query: {
+    populate: "image",
+    sort: "createdAt:desc",
+    "pagination[pageSize]": 100,
+
+    // Only active products
+    "filters[is_active][$eq]": true,
+  },
 });
-const selectedFile = ref(null);
-const imagePreview = ref(null);
-const currentImage = ref(null);
-const categories = [
-  "Electronics",
-  "Fashion",
-  "Sports",
-  "Bags",
-  "Beauty",
-  "Home & Living",
-  "Toys",
-];
-const priceRules = [
-  (value) =>
-    (value !== null && value !== "" && Number.isFinite(Number(value))) ||
-    "Price is required",
-  (value) => Number(value) >= 0 || "Price cannot be negative",
-];
-const stockRules = [
-  (value) =>
-    (value !== null && value !== "" && Number.isFinite(Number(value))) ||
-    "Stock is required",
-  (value) => Number(value) >= 0 || "Stock cannot be negative",
-  (value) => Number.isInteger(Number(value)) || "Stock must be a whole number",
-];
-const snackbar = reactive({
-  show: false,
-  message: "",
-  color: "success",
+
+// PRODUCT DATA
+const products = computed(() => {
+  return response.value?.data ?? [];
 });
+
+// UNIQUE CATEGORIES
+const categories = computed(() => {
+  return [
+    ...new Set(
+      products.value.map((product) => product.category).filter(Boolean),
+    ),
+  ];
+});
+
+// FILTER PRODUCTS
 const filteredProducts = computed(() => {
-  if (!search.value) {
-    return products.value;
-  }
-  const keyword = search.value.toLowerCase().trim();
-  return products.value.filter((product) => {
-    const name = product.name?.toLowerCase() || "";
-    const description = product.description?.toLowerCase() || "";
-    const category = product.category?.toLowerCase() || "";
-    return (
-      name.includes(keyword) ||
-      description.includes(keyword) ||
-      category.includes(keyword)
-    );
-  });
+  return products.value
+    .filter((product) => product.is_active)
+    .filter((product) => {
+      const search = searchQuery.value.toLowerCase().trim();
+
+      const matchesSearch =
+        product.name?.toLowerCase().includes(search) ||
+        product.description?.toLowerCase().includes(search) ||
+        product.category?.toLowerCase().includes(search);
+
+      const matchesCategory =
+        selectedCategory.value === "All" ||
+        product.category === selectedCategory.value;
+
+      return matchesSearch && matchesCategory;
+    })
+    .slice(0, 8);
 });
-async function getProducts() {
-  loading.value = true;
-  try {
-    const response = await $fetch(`${STRAPI_URL}/api/products`, {
-      query: {
-        populate: "image",
-        sort: "createdAt:desc",
-        "pagination[pageSize]": 100,
-      },
+
+// CART ITEM COUNT
+const cartItemCount = computed(() => {
+  return cart.value.reduce((total, item) => total + item.quantity, 0);
+});
+
+// CART TOTAL
+const cartTotal = computed(() => {
+  return cart.value.reduce(
+    (total, item) => total + item.price * item.quantity,
+    0,
+  );
+});
+
+// ADD TO CART
+function addToCart(product: Product) {
+  const existingItem = cart.value.find(
+    (item) => item.documentId === product.documentId,
+  );
+
+  // Reject inactive products
+  if (!product.is_active) {
+    cartMessage.value = "This product is unavailable.";
+    showCartMessage.value = true;
+    return;
+  }
+
+  // Reject out-of-stock products
+  if (product.stock <= 0) {
+    cartMessage.value = "This product is out of stock.";
+    showCartMessage.value = true;
+    return;
+  }
+  if (existingItem) {
+    if (existingItem.quantity >= product.stock) {
+      cartMessage.value = "Maximum available stock reached.";
+      showCartMessage.value = true;
+      return;
+    }
+
+    existingItem.quantity++;
+  } else {
+    if (product.stock <= 0) return;
+
+    cart.value.push({
+      ...product,
+      quantity: 1,
     });
-    products.value = response.data || [];
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    console.log("PRODUCT RESPONSE:", response.data);
-    showSnackbar("Unable to load products.", "error");
-  } finally {
-    loading.value = false;
+  }
+
+  cartMessage.value = `${product.name} added to cart!`;
+  showCartMessage.value = true;
+}
+
+// INCREASE QUANTITY
+function increaseQuantity(documentId: string) {
+  const item = cart.value.find((item) => item.documentId === documentId);
+
+  if (!item) return;
+
+  if (item.quantity < item.stock) {
+    item.quantity++;
   }
 }
 
-// async function getProducts() {
-//   loading.value = true;
+// DECREASE QUANTITY
+function decreaseQuantity(documentId: string) {
+  const item = cart.value.find((item) => item.documentId === documentId);
 
-//   try {
-//     const response = await $fetch(`${STRAPI_URL}/api/products`, {
-//       query: {
-//         populate: "image",
-//         sort: "createdAt:desc",
-//         "pagination[pageSize]": 100,
-//       },
-//     });
+  if (!item) return;
 
-//     console.log("FULL RESPONSE:", response);
-//     console.log("FIRST PRODUCT:", response.data?.[0]);
-//     console.log("PRODUCT IMAGE:", response.data?.[0]?.image);
+  if (item.quantity > 1) {
+    item.quantity--;
+  }
+}
 
-//     products.value = response.data || [];
+// REMOVE ITEM
+function removeFromCart(documentId: string) {
+  cart.value = cart.value.filter((item) => item.documentId !== documentId);
+}
 
-//   } catch (error) {
-//     console.error("Error fetching products:", error);
-//     showSnackbar("Unable to load products.", "error");
-//   } finally {
-//     loading.value = false;
-//   }
-// }
-onMounted(() => {
-  getProducts();
-});
-// function getImageUrl(image) {
-//   if (!image?.url) return "";
-//   if (image.url.startsWith("http://") || image.url.startsWith("https://")) {
-//     return image.url;
-//   }
-//   return `${STRAPI_URL}${image.url}`;
-// }
-function getImageUrl(image) {
+// CLEAR CART
+function clearCart() {
+  cart.value = [];
+}
+
+// GET PRODUCT IMAGE URL
+function getImageUrl(image: any): string {
   const imageData = Array.isArray(image) ? image[0] : image;
 
   if (!imageData?.url) return "";
 
-  if (
-    imageData.url.startsWith("http://") ||
-    imageData.url.startsWith("https://")
-  ) {
-    return imageData.url;
+  const imageUrl =
+    imageData.formats?.medium?.url ||
+    imageData.formats?.small?.url ||
+    imageData.url;
+
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+    return imageUrl;
   }
 
-  return `${STRAPI_URL}${imageData.url}`;
+  return `${STRAPI_URL}${imageUrl}`;
 }
-function formatPrice(price) {
+
+// FORMAT PRICE
+function formatPrice(price: number): string {
   return new Intl.NumberFormat("en-PH", {
     style: "currency",
     currency: "PHP",
-  }).format(Number(price || 0));
-}
-function getStockColor(stock) {
-  if (Number(stock) === 0) return "error";
-  if (Number(stock) <= 5) return "warning";
-  return "success";
-}
-function openCreateDialog() {
-  resetForm();
-  isEditing.value = false;
-  selectedProduct.value = null;
-  productDialog.value = true;
-}
-async function createProduct() {
-  const response = await $fetch(`${STRAPI_URL}/api/products`, {
-    method: "POST",
-    body: {
-      data: {
-        name: form.name,
-        description: form.description,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        category: form.category,
-        is_active: form.is_active,
-      },
-    },
-  });
-  if (selectedFile.value && response.data) {
-    await uploadProductImage(response.data.id);
-  }
-  showSnackbar("Product created successfully.", "success");
-}
-async function uploadProductImage(productId) {
-  const file = getSelectedFile();
-  if (!file) return;
-  const formData = new FormData();
-  formData.append("files", file);
-  formData.append("ref", "api::product.product");
-  formData.append("refId", String(productId));
-  formData.append("field", "image");
-  await $fetch(`${STRAPI_URL}/api/upload`, {
-    method: "POST",
-    body: formData,
-  });
-}
-function handleImageChange(value) {
-  // Release the previous preview URL before creating or clearing a preview.
-  if (imagePreview.value) {
-    URL.revokeObjectURL(imagePreview.value);
-    imagePreview.value = null;
-  }
-
-  const file = getFileFromValue(value);
-  if (!file) return;
-
-  imagePreview.value = URL.createObjectURL(file);
-}
-function getSelectedFile() {
-  return getFileFromValue(selectedFile.value);
-}
-function getFileFromValue(value) {
-  if (!value) return null;
-  if (value instanceof File) return value;
-  if (Array.isArray(value) && value.length > 0) return value[0];
-  return null;
-}
-function openEditDialog(product) {
-  selectedProduct.value = product;
-  isEditing.value = true;
-  form.name = product.name || "";
-  form.description = product.description || "";
-  form.price = Number(product.price) || 0;
-  form.stock = Number(product.stock) || 0;
-  form.category = product.category || "";
-  form.is_active = product.is_active ?? true;
-  currentImage.value = product.image || null;
-  selectedFile.value = null;
-  imagePreview.value = null;
-  productDialog.value = true;
-}
-async function updateProduct() {
-  if (!selectedProduct.value) return;
-  const response = await $fetch(
-    `${STRAPI_URL}/api/products/${selectedProduct.value.documentId}`,
-    {
-      method: "PUT",
-      body: {
-        data: {
-          name: form.name,
-          description: form.description,
-          price: Number(form.price),
-          stock: Number(form.stock),
-          category: form.category,
-          is_active: form.is_active,
-        },
-      },
-    },
-  );
-  if (selectedFile.value && response.data) {
-    await uploadProductImage(response.data.id);
-  }
-  showSnackbar("Product updated successfully.", "success");
-}
-async function saveProduct() {
-  const validation = await productForm.value?.validate();
-  if (validation && !validation.valid) return;
-  saving.value = true;
-  try {
-    if (isEditing.value) {
-      await updateProduct();
-    } else {
-      await createProduct();
-    }
-    closeProductDialog();
-    await getProducts();
-  } catch (error) {
-    console.error("Error saving product:", error);
-    showSnackbar(getErrorMessage(error), "error");
-  } finally {
-    saving.value = false;
-  }
-}
-function openDeleteDialog(product) {
-  selectedProduct.value = product;
-  deleteDialog.value = true;
-}
-async function deleteProduct() {
-  if (!selectedProduct.value) return;
-  deleting.value = true;
-  try {
-    await $fetch(
-      `${STRAPI_URL}/api/products/${selectedProduct.value.documentId}`,
-      { method: "DELETE" },
-    );
-    deleteDialog.value = false;
-    showSnackbar("Product deleted successfully.", "success");
-    await getProducts();
-  } catch (error) {
-    showSnackbar(getErrorMessage(error), "error");
-  } finally {
-    deleting.value = false;
-  }
-}
-function viewProduct(product) {
-  selectedProduct.value = product;
-  viewDialog.value = true;
-}
-function showSnackbar(message, color = "success") {
-  snackbar.message = message;
-  snackbar.color = color;
-  snackbar.show = true;
-}
-function getErrorMessage(error) {
-  return (
-    error?.data?.error?.message ||
-    error?.data?.message ||
-    error?.message ||
-    "Something went wrong."
-  );
-}
-function resetForm() {
-  form.name = "";
-  form.description = "";
-  form.price = 0;
-  form.stock = 0;
-  form.category = "";
-  form.is_active = true;
-  selectedFile.value = null;
-  currentImage.value = null;
-  if (imagePreview.value) {
-    URL.revokeObjectURL(imagePreview.value);
-  }
-  imagePreview.value = null;
-}
-function closeProductDialog() {
-  productDialog.value = false;
-  resetForm();
+  }).format(price || 0);
 }
 
-onBeforeUnmount(() => {
-  if (imagePreview.value) {
-    URL.revokeObjectURL(imagePreview.value);
+// WISHLIST STATE
+const wishlist = ref<string[]>([]);
+
+// TOGGLE WISHLIST
+function toggleWishlist(product: Product) {
+  const productId = product.documentId;
+
+  if (wishlist.value.includes(productId)) {
+    wishlist.value = wishlist.value.filter((id) => id !== productId);
+
+    cartMessage.value = `${product.name} removed from wishlist.`;
+  } else {
+    wishlist.value.push(productId);
+
+    cartMessage.value = `${product.name} added to wishlist!`;
   }
-});
+
+  showCartMessage.value = true;
+}
+
+// CHECK WISHLIST
+function isWishlisted(product: Product): boolean {
+  return wishlist.value.includes(product.documentId);
+}
 </script>
+
 <style scoped>
-/* Page-specific CSS goes here */
-.product-layout {
-  min-height: 100vh;
+.hero-section {
+  background: linear-gradient(120deg, #1565c0, #42a5f5);
+  color: white;
 }
-.product-page {
-  min-height: 100vh;
-  background: #f5f7fb;
+
+.image-placeholder {
+  height: 200px;
+  background-color: #eeeeee;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.shop-header {
-  background: #ffffff !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+
+.cart-drawer {
+  max-width: 100vw;
 }
-.logo-link {
-  text-decoration: none;
-  white-space: nowrap;
+
+.product-image-container {
+  position: relative;
 }
-.product-table-card {
-  overflow-x: auto;
-}
-.description-text {
-  max-width: 320px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-size: 13px;
-}
-.image-preview {
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  border-radius: 12px;
-  background: #f5f5f5;
-}
-.product-view-image {
-  background: #f8f9fa;
+
+.wishlist-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
 }
 </style>
