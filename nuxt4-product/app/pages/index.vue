@@ -1,110 +1,140 @@
 <template>
-  <v-container fluid class="pa-0">
-    <!-- FULL PAGE SKELETON LOADING -->
-    <div v-if="pending">
-      <!-- NAVBAR SKELETON -->
-      <v-app-bar color="white" elevation="1" height="75">
-        <v-container class="d-flex align-center ga-4">
-          <v-skeleton-loader type="heading" width="120" />
-          <v-spacer />
-          <v-skeleton-loader type="text" width="55" />
-          <v-skeleton-loader type="text" width="70" />
-          <v-skeleton-loader type="avatar" />
-        </v-container>
-      </v-app-bar>
-
-      <!-- HERO SKELETON -->
-      <v-container class="py-16">
-        <v-row align="center">
-          <v-col cols="12" md="7">
-            <v-skeleton-loader type="heading" class="mb-4" />
-            <v-skeleton-loader type="paragraph" class="mb-6" />
-            <v-skeleton-loader type="button" width="140" />
-          </v-col>
-          <v-col cols="12" md="5">
-            <v-skeleton-loader type="image" height="180" />
-          </v-col>
-        </v-row>
-      </v-container>
-
-      <!-- SEARCH SKELETON -->
-      <v-container class="py-8">
-        <v-skeleton-loader type="text" />
-      </v-container>
-
-      <!-- CATEGORIES SKELETON -->
+  <v-container fluid class="pa-0 nike-style">
+    <!-- LOADING -->
+    <div v-if="pending" class="loading-page">
       <v-container>
-        <v-skeleton-loader type="heading" width="180" class="mb-4" />
-        <div class="d-flex flex-wrap ga-3 mb-8">
-          <v-skeleton-loader v-for="n in 5" :key="n" type="button" width="75" />
-        </div>
-      </v-container>
-
-      <!-- PROMOTIONS SKELETON -->
-      <v-container class="pb-8">
-        <v-skeleton-loader type="image" height="220" />
-      </v-container>
-
-      <!-- FEATURED PRODUCTS SKELETON -->
-      <v-container class="pb-12">
-        <div class="d-flex justify-space-between align-center mb-5">
-          <v-skeleton-loader type="heading" width="200" />
-          <v-skeleton-loader type="button" width="100" />
-        </div>
-
+        <v-skeleton-loader type="heading" class="mb-8" />
+        <v-skeleton-loader type="image" height="400" class="mb-8" />
         <v-row>
-          <v-col v-for="n in 8" :key="n" cols="12" sm="6" md="4" lg="3">
-            <v-card rounded="lg" elevation="2">
-              <v-skeleton-loader type="image" height="200" />
-              <v-card-text>
-                <v-skeleton-loader type="heading" class="mb-3" />
-                <v-skeleton-loader type="text" />
-                <v-skeleton-loader type="text" width="60%" />
-                <v-skeleton-loader type="button" class="mt-4" />
-              </v-card-text>
-            </v-card>
+          <v-col v-for="n in 4" :key="n" cols="6" md="3">
+            <v-skeleton-loader type="card" />
           </v-col>
         </v-row>
       </v-container>
-
-      <!-- NEWSLETTER SKELETON -->
-      <v-container class="pb-12">
-        <v-skeleton-loader type="image" height="180" />
-      </v-container>
-
-      <!-- FOOTER SKELETON -->
-      <v-skeleton-loader type="paragraph" class="pa-8" />
     </div>
 
-    <!-- ACTUAL HOMEPAGE -->
     <div v-else>
-      <!-- NAVIGATION BAR -->
-      <v-app-bar color="white" elevation="1" height="75">
-        <v-container class="d-flex align-center">
-          <v-toolbar-title class="font-weight-bold text-primary">
-            ShopKart
-          </v-toolbar-title>
+      <!-- TOP ANNOUNCEMENT -->
+      <div class="announcement-bar">FREE SHIPPING ON SELECTED ORDERS</div>
+      <!-- NAVBAR -->
+      <v-app-bar height="76" color="#F4F4F0" elevation="0" class="main-navbar">
+        <v-container
+          fluid
+          class="navbar-container d-flex align-center px-5 px-md-10"
+        >
+          <!-- LOGO -->
+          <NuxtLink to="/" class="brand-logo"> NN. </NuxtLink>
 
           <v-spacer />
 
-          <v-btn to="/" variant="text" color="primary">Home</v-btn>
-          <v-btn to="/products" variant="text">Products</v-btn>
+          <!-- DESKTOP NAVIGATION -->
+          <div class="desktop-navigation">
+            <v-btn href="#top" variant="text" color="black"> Home </v-btn>
 
-          <!-- CART ICON -->
-          <v-badge
-            :content="cartItemCount"
-            :model-value="cartItemCount > 0"
-            color="error"
-            floating
-          >
-            <v-btn icon variant="text" @click="cartDrawer = true">
-              <v-icon size="28">mdi-cart-outline</v-icon>
+            <v-btn href="#products" variant="text" color="black"> Shop </v-btn>
+
+            <v-btn to="/products" variant="text" color="black">
+              Collections
             </v-btn>
-          </v-badge>
+          </div>
+
+          <v-spacer />
+
+          <!-- DESKTOP CART -->
+          <div class="desktop-cart">
+            <v-badge
+              :content="cartItemCount"
+              :model-value="cartItemCount > 0"
+              color="error"
+              floating
+            >
+              <v-btn
+                icon
+                variant="text"
+                color="black"
+                @click="cartDrawer = true"
+              >
+                <v-icon size="25">mdi-shopping-bag-outline</v-icon>
+              </v-btn>
+            </v-badge>
+          </div>
+
+          <!-- MOBILE HAMBURGER -->
+          <v-btn
+            class="mobile-menu-button"
+            icon
+            variant="text"
+            color="black"
+            @click="mobileMenu = !mobileMenu"
+          >
+            <v-icon size="28">
+              {{ mobileMenu ? "mdi-close" : "mdi-menu" }}
+            </v-icon>
+          </v-btn>
         </v-container>
       </v-app-bar>
 
-      <!-- CART SIDE DRAWER -->
+      <!-- MOBILE MENU DRAWER -->
+      <v-navigation-drawer
+        v-model="mobileMenu"
+        location="right"
+        temporary
+        width="300"
+        class="mobile-navigation"
+      >
+        <div class="mobile-menu-header">
+          <span class="mobile-menu-title">MENU</span>
+
+          <v-btn icon="mdi-close" variant="text" @click="mobileMenu = false" />
+        </div>
+
+        <v-divider />
+
+        <div class="mobile-menu-links">
+          <a href="#top" @click="mobileMenu = false">
+            HOME
+            <v-icon>mdi-arrow-up-right</v-icon>
+          </a>
+
+          <a href="#products" @click="mobileMenu = false">
+            SHOP
+            <v-icon>mdi-arrow-up-right</v-icon>
+          </a>
+
+          <NuxtLink to="/products" @click="mobileMenu = false">
+            COLLECTIONS
+            <v-icon>mdi-arrow-up-right</v-icon>
+          </NuxtLink>
+
+          <v-divider class="my-3" />
+
+          <button
+            class="mobile-cart-link"
+            @click="
+              mobileMenu = false;
+              cartDrawer = true;
+            "
+          >
+            <span>
+              <v-icon class="mr-3">mdi-shopping-bag-outline</v-icon>
+              MY CART
+            </span>
+
+            <v-badge
+              :content="cartItemCount"
+              :model-value="cartItemCount > 0"
+              color="error"
+              inline
+            />
+          </button>
+        </div>
+
+        <template #append>
+          <div class="mobile-menu-footer">NOOK / NEST — MOVE YOUR WAY.</div>
+        </template>
+      </v-navigation-drawer>
+
+      <!-- CART DRAWER -->
       <v-navigation-drawer
         v-model="cartDrawer"
         location="right"
@@ -112,28 +142,33 @@
         width="400"
         class="cart-drawer"
       >
-        <div class="d-flex align-center justify-space-between pa-4">
-          <h2 class="text-h5 font-weight-bold">Your Cart</h2>
+        <div class="d-flex justify-space-between align-center pa-5">
+          <h2 class="text-h5 font-weight-bold">YOUR BAG</h2>
           <v-btn icon="mdi-close" variant="text" @click="cartDrawer = false" />
         </div>
 
         <v-divider />
 
-        <!-- EMPTY CART -->
-        <div v-if="cart.length === 0" class="text-center pa-8">
-          <v-icon size="75" color="grey-lighten-1">mdi-cart-outline</v-icon>
-          <h3 class="mt-4">Your cart is empty</h3>
-          <p class="text-medium-emphasis mt-2">
-            Add some products to get started!
-          </p>
+        <div v-if="cart.length === 0" class="empty-cart">
+          <v-icon size="70">mdi-shopping-bag-outline</v-icon>
+          <h3 class="mt-4">Your bag is empty.</h3>
+          <p class="mt-2">Find something worth wearing.</p>
+          <v-btn
+            to="/products"
+            color="black"
+            class="mt-5"
+            @click="cartDrawer = false"
+          >
+            SHOP NOW
+          </v-btn>
         </div>
 
-        <!-- CART ITEMS -->
         <div v-else class="pa-4">
           <v-card
             v-for="item in cart"
             :key="item.documentId"
-            variant="outlined"
+            variant="flat"
+            color="#F4F4F0"
             class="mb-3"
           >
             <v-card-text>
@@ -141,16 +176,9 @@
                 <v-col cols="4">
                   <v-img
                     :src="getImageUrl(item.image) || undefined"
-                    height="85"
+                    height="90"
                     cover
-                    class="rounded"
-                  >
-                    <template #placeholder>
-                      <div class="image-placeholder">
-                        <v-icon>mdi-image-outline</v-icon>
-                      </div>
-                    </template>
-                  </v-img>
+                  />
                 </v-col>
 
                 <v-col cols="8">
@@ -158,18 +186,14 @@
                     <strong>{{ item.name }}</strong>
                     <v-btn
                       icon="mdi-delete-outline"
-                      color="error"
                       size="small"
                       variant="text"
                       @click="removeFromCart(item.documentId)"
                     />
                   </div>
 
-                  <p class="text-body-2 mt-1">
-                    Subtotal:
-                    <strong class="text-primary">
-                      {{ formatPrice(item.price * item.quantity) }}
-                    </strong>
+                  <p class="font-weight-bold mt-2">
+                    {{ formatPrice(item.price * item.quantity) }}
                   </p>
 
                   <div class="d-flex align-center mt-2">
@@ -181,9 +205,7 @@
                       @click="decreaseQuantity(item.documentId)"
                     />
 
-                    <span class="mx-3 font-weight-bold">
-                      {{ item.quantity }}
-                    </span>
+                    <span class="mx-3">{{ item.quantity }}</span>
 
                     <v-btn
                       icon="mdi-plus"
@@ -200,171 +222,280 @@
 
           <v-divider class="my-4" />
 
-          <div class="d-flex justify-space-between mb-2">
-            <span>Items</span>
-            <strong>{{ cartItemCount }}</strong>
-          </div>
-
           <div class="d-flex justify-space-between mb-4">
-            <span class="text-h6 font-weight-bold">Subtotal</span>
-            <span class="text-h6 font-weight-bold text-primary">
-              {{ formatPrice(cartTotal) }}
-            </span>
+            <strong>SUBTOTAL</strong>
+            <strong>{{ formatPrice(cartTotal) }}</strong>
           </div>
 
-          <v-btn
-            color="error"
-            variant="outlined"
-            block
-            class="mb-3"
-            @click="clearCart"
-          >
-            Clear Cart
+          <v-btn block variant="outlined" class="mb-3" @click="clearCart">
+            CLEAR BAG
           </v-btn>
 
-          <v-btn color="primary" block size="large" disabled>
-            Proceed to Checkout
-          </v-btn>
+          <v-btn block color="black" size="large" disabled> CHECKOUT </v-btn>
 
-          <p class="text-caption text-center mt-2 text-medium-emphasis">
-            Checkout will be available in a future update.
-          </p>
+          <p class="text-caption text-center mt-3">Checkout coming soon.</p>
         </div>
       </v-navigation-drawer>
 
-      <!-- HERO SECTION -->
-      <section class="hero-section">
-        <v-container class="py-16">
-          <v-row align="center">
-            <v-col cols="12" md="7">
-              <h1 class="text-h3 text-md-h2 font-weight-bold mb-4">
-                Discover Your Next Favorite Product
-              </h1>
+      <!-- HERO CAROUSEL -->
+      <section id="top" class="hero-section">
+        <v-carousel
+          height="840"
+          cycle
+          :interval="5000"
+          show-arrows="hover"
+          hide-delimiter-background
+          color="white"
+        >
+          <!-- SLIDE 1 -->
+          <v-carousel-item>
+            <div class="hero-slide slide-one">
+              <div class="hero-overlay"></div>
 
-              <p class="text-h6 mb-6">
-                Find quality products at affordable prices. Shopping made simple
-                with ShopKart.
-              </p>
+              <div class="hero-content">
+                <span class="hero-eyebrow"> THE NEW COLLECTION </span>
 
-              <v-btn
-                to="/products"
-                color="white"
-                variant="flat"
-                size="large"
-                rounded="lg"
-              >
-                Shop Now
-                <v-icon end>mdi-arrow-right</v-icon>
-              </v-btn>
-            </v-col>
+                <h1>
+                  MOVE<br />
+                  YOUR<br />
+                  WAY.
+                </h1>
 
-            <v-col cols="12" md="5" class="text-center">
-              <v-icon size="180" color="white">mdi-shopping</v-icon>
-            </v-col>
-          </v-row>
-        </v-container>
+                <p>
+                  Everyday essentials. Timeless style. Discover your next
+                  favorite find.
+                </p>
+
+                <v-btn
+                  href="#products"
+                  color="white"
+                  rounded="pill"
+                  size="x-large"
+                  class="hero-button"
+                >
+                  SHOP NOW
+                  <v-icon end>mdi-arrow-right</v-icon>
+                </v-btn>
+              </div>
+
+              <div class="hero-bottom-label">01 — EVERYDAY COLLECTION</div>
+            </div>
+          </v-carousel-item>
+
+          <!-- SLIDE 2 -->
+          <v-carousel-item>
+            <div class="hero-slide slide-two">
+              <div class="hero-overlay"></div>
+
+              <div class="hero-content">
+                <span class="hero-eyebrow"> FIND YOUR STYLE </span>
+
+                <h1>
+                  OWN<br />
+                  YOUR<br />
+                  LOOK.
+                </h1>
+
+                <p>Simple pieces. Strong identity. Make every day your own.</p>
+
+                <v-btn
+                  href="#products"
+                  color="white"
+                  rounded="pill"
+                  size="x-large"
+                  class="hero-button"
+                >
+                  EXPLORE NOW
+                  <v-icon end>mdi-arrow-right</v-icon>
+                </v-btn>
+              </div>
+
+              <div class="hero-bottom-label">02 — STYLE COLLECTION</div>
+            </div>
+          </v-carousel-item>
+
+          <!-- SLIDE 3 -->
+          <v-carousel-item>
+            <div class="hero-slide slide-three">
+              <div class="hero-overlay"></div>
+
+              <div class="hero-content">
+                <span class="hero-eyebrow"> MADE FOR EVERYDAY </span>
+
+                <h1>
+                  LIVE<br />
+                  IN<br />
+                  STYLE.
+                </h1>
+
+                <p>
+                  Discover fresh finds designed to fit your everyday lifestyle.
+                </p>
+
+                <v-btn
+                  href="#products"
+                  color="white"
+                  rounded="pill"
+                  size="x-large"
+                  class="hero-button"
+                >
+                  DISCOVER MORE
+                  <v-icon end>mdi-arrow-right</v-icon>
+                </v-btn>
+              </div>
+
+              <div class="hero-bottom-label">03 — LIFESTYLE COLLECTION</div>
+            </div>
+          </v-carousel-item>
+        </v-carousel>
       </section>
 
-      <!-- SEARCH -->
-      <v-container class="py-8">
-        <v-text-field
-          v-model="searchQuery"
-          label="Search products..."
-          prepend-inner-icon="mdi-magnify"
-          variant="outlined"
-          rounded="lg"
-          clearable
-          hide-details
-        />
-      </v-container>
-
       <!-- CATEGORIES -->
-      <v-container>
-        <h2 class="text-h5 font-weight-bold mb-4">Shop by Category</h2>
+      <v-container id="categories" class="section-spacing">
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">EXPLORE</span>
+            <h2>SHOP BY CATEGORY.</h2>
+          </div>
+        </div>
 
-        <div class="d-flex flex-wrap ga-2 mb-8">
+        <div class="category-list">
           <v-chip
-            :color="selectedCategory === 'All' ? 'primary' : undefined"
+            :color="selectedCategory === 'All' ? 'black' : undefined"
             :variant="selectedCategory === 'All' ? 'flat' : 'outlined'"
+            size="large"
             @click="selectedCategory = 'All'"
           >
-            All
+            ALL
           </v-chip>
 
           <v-chip
             v-for="category in categories"
             :key="category"
-            :color="selectedCategory === category ? 'primary' : undefined"
+            :color="selectedCategory === category ? 'black' : undefined"
             :variant="selectedCategory === category ? 'flat' : 'outlined'"
+            size="large"
             @click="selectedCategory = category"
           >
-            {{ category }}
+            {{ category.toUpperCase() }}
           </v-chip>
         </div>
       </v-container>
 
-      <!-- PROMOTIONS -->
-      <v-container class="pb-8">
-        <v-card rounded="xl" color="deep-purple-darken-2" class="pa-6 pa-md-10">
-          <v-row align="center">
-            <v-col cols="12" md="8">
-              <v-chip color="yellow" class="mb-4" size="small">
-                SPECIAL OFFER
-              </v-chip>
+      <!-- PROMOTION -->
+      <v-container class="section-spacing">
+        <section class="promo-section">
+          <div>
+            <span class="eyebrow light-eyebrow"> MADE FOR EVERYDAY </span>
 
-              <h2 class="text-h4 font-weight-bold text-white mb-3">
-                Great Deals Await!
-              </h2>
+            <h2>
+              LESS ORDINARY.<br />
+              MORE YOU.
+            </h2>
 
-              <p class="text-body-1 text-white mb-5">
-                Discover amazing products and enjoy shopping with ShopKart.
-              </p>
+            <p>
+              Discover products that bring style and simplicity into your
+              everyday life.
+            </p>
 
-              <v-btn
-                to="/products"
-                color="yellow"
-                class="text-black"
-                rounded="lg"
-              >
-                Explore Products
-                <v-icon end>mdi-arrow-right</v-icon>
-              </v-btn>
-            </v-col>
+            <v-btn to="/products" color="white" rounded="pill" size="large">
+              EXPLORE MORE
+              <v-icon end>mdi-arrow-right</v-icon>
+            </v-btn>
+          </div>
 
-            <v-col cols="12" md="4" class="text-center">
-              <v-icon size="130" color="yellow">mdi-tag-heart</v-icon>
-            </v-col>
-          </v-row>
-        </v-card>
+          <v-icon size="150" color="#D5D5D0">
+            mdi-star-four-points-outline
+          </v-icon>
+        </section>
       </v-container>
 
       <!-- FEATURED PRODUCTS -->
-      <v-container class="pb-12">
-        <div class="d-flex align-center justify-space-between mb-5">
-          <h2 class="text-h5 font-weight-bold">Featured Products</h2>
+      <v-container id="products" class="section-spacing pb-12">
+        <!-- PRODUCT HEADER -->
+        <div class="section-header">
+          <div>
+            <span class="eyebrow">THE COLLECTION</span>
+            <h2>FRESH FINDS.</h2>
+            <p>Find your next everyday favorite.</p>
+          </div>
 
-          <v-btn to="/products" variant="text" color="primary">
-            View All
+          <v-btn
+            to="/products"
+            variant="text"
+            color="black"
+            class="font-weight-bold"
+          >
+            VIEW ALL
             <v-icon end>mdi-arrow-right</v-icon>
           </v-btn>
         </div>
 
-        <!-- ERROR STATE -->
-        <v-alert v-if="error" type="warning" variant="tonal">
+        <!-- PRODUCT SEARCH -->
+        <div class="product-search-area">
+          <div class="product-search">
+            <v-icon icon="mdi-magnify" size="23" color="#777" />
+
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search products, categories..."
+              class="product-search-input"
+            />
+
+            <button
+              v-if="searchQuery"
+              class="search-clear"
+              @click="searchQuery = ''"
+              aria-label="Clear search"
+            >
+              <v-icon icon="mdi-close" />
+            </button>
+          </div>
+
+          <span class="search-caption"> FIND SOMETHING YOU LOVE. </span>
+        </div>
+
+        <!-- CATEGORY FILTER -->
+        <div class="category-list product-category-list">
+          <v-chip
+            :color="selectedCategory === 'All' ? 'black' : undefined"
+            :variant="selectedCategory === 'All' ? 'flat' : 'outlined'"
+            size="large"
+            @click="selectedCategory = 'All'"
+          >
+            ALL
+          </v-chip>
+
+          <v-chip
+            v-for="category in categories"
+            :key="category"
+            :color="selectedCategory === category ? 'black' : undefined"
+            :variant="selectedCategory === category ? 'flat' : 'outlined'"
+            size="large"
+            @click="selectedCategory = category"
+          >
+            {{ category.toUpperCase() }}
+          </v-chip>
+        </div>
+
+        <!-- ERROR -->
+        <v-alert v-if="error" type="warning" variant="tonal" class="mt-6">
           Unable to load products. Please check your Strapi connection.
         </v-alert>
 
-        <!-- EMPTY STATE -->
+        <!-- EMPTY -->
         <v-alert
           v-else-if="filteredProducts.length === 0"
           type="info"
           variant="tonal"
+          class="mt-6"
         >
-          No products found.
+          No products found. Try another search.
         </v-alert>
 
-        <!-- PRODUCT CARDS -->
-        <v-row v-else>
+        <!-- PRODUCT GRID -->
+        <v-row v-else class="mt-4">
           <v-col
             v-for="product in filteredProducts"
             :key="product.documentId"
@@ -373,71 +504,79 @@
             md="4"
             lg="3"
           >
-            <v-card rounded="lg" elevation="2" height="100%">
-              <div class="product-image-container">
+            <v-card
+              class="product-card"
+              rounded="0"
+              elevation="0"
+              height="100%"
+            >
+              <div class="product-image">
                 <v-img
                   v-if="getImageUrl(product.image)"
                   :src="getImageUrl(product.image)"
-                  height="200"
+                  height="270"
                   cover
                 />
 
                 <div v-else class="image-placeholder">
-                  <v-icon size="65" color="grey">mdi-image-outline</v-icon>
+                  <v-icon size="60">mdi-image-outline</v-icon>
                 </div>
 
-                <!-- WISHLIST BUTTON -->
                 <v-btn
                   icon
                   size="small"
-                  elevation="2"
+                  color="white"
                   class="wishlist-button"
-                  :color="isWishlisted(product) ? 'red' : 'white'"
                   @click.stop="toggleWishlist(product)"
                 >
-                  <v-icon :color="isWishlisted(product) ? 'white' : 'red'">
+                  <v-icon :color="isWishlisted(product) ? 'red' : 'black'">
                     {{
                       isWishlisted(product) ? "mdi-heart" : "mdi-heart-outline"
                     }}
                   </v-icon>
                 </v-btn>
+
+                <div class="product-tag" v-if="product.stock > 0">
+                  AVAILABLE
+                </div>
+
+                <div class="product-tag out-of-stock" v-else>SOLD OUT</div>
               </div>
 
-              <v-card-item>
-                <v-card-title class="text-subtitle-1 font-weight-bold">
-                  {{ product.name }}
-                </v-card-title>
+              <v-card-text class="px-0">
+                <div class="d-flex justify-space-between align-start">
+                  <div>
+                    <h3 class="product-name">
+                      {{ product.name }}
+                    </h3>
 
-                <v-card-subtitle>
-                  {{ product.category || "General" }}
-                </v-card-subtitle>
-              </v-card-item>
+                    <p class="product-category">
+                      {{ product.category || "EVERYDAY COLLECTION" }}
+                    </p>
+                  </div>
 
-              <v-card-text>
-                <p class="text-body-2 text-medium-emphasis mb-3">
-                  {{ product.description || "No description available." }}
-                </p>
-
-                <div class="d-flex align-center justify-space-between">
-                  <span class="text-h6 font-weight-bold text-primary">
+                  <strong class="product-price">
                     {{ formatPrice(product.price) }}
-                  </span>
-
-                  <v-chip size="small" color="success" variant="tonal">
-                    {{ product.stock }} in stock
-                  </v-chip>
+                  </strong>
                 </div>
+
+                <p class="product-description">
+                  {{
+                    product.description || "A fresh find for everyday living."
+                  }}
+                </p>
               </v-card-text>
 
-              <v-card-actions class="pa-4">
+              <v-card-actions class="pa-0 pb-4">
                 <v-btn
-                  color="primary"
+                  color="black"
                   block
+                  rounded="pill"
                   :disabled="product.stock <= 0"
                   @click="addToCart(product)"
                 >
-                  <v-icon start>mdi-cart-plus</v-icon>
-                  Add to Cart
+                  ADD TO BAG
+                  <v-icon end>mdi-plus</v-icon>
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -446,23 +585,25 @@
       </v-container>
 
       <!-- NEWSLETTER -->
-      <v-container class="pb-12">
-        <v-card rounded="xl" color="blue-grey-lighten-5" class="pa-6 pa-md-10">
+      <section class="newsletter-section">
+        <v-container class="py-12">
           <v-row align="center">
             <v-col cols="12" md="6">
-              <h2 class="text-h4 font-weight-bold mb-3">Stay Updated!</h2>
+              <span class="eyebrow">STAY IN THE GAME</span>
 
-              <p class="text-body-1 text-medium-emphasis">
-                Subscribe to our newsletter and stay informed about new products
-                and special offers.
-              </p>
+              <h2>
+                NEVER MISS<br />
+                A THING.
+              </h2>
+
+              <p>Get the latest updates, new arrivals, and exclusive offers.</p>
             </v-col>
 
             <v-col cols="12" md="6">
               <v-form @submit.prevent="subscribeNewsletter">
                 <v-text-field
                   v-model="newsletterEmail"
-                  label="Enter your email address"
+                  label="Your email address"
                   type="email"
                   variant="outlined"
                   bg-color="white"
@@ -474,39 +615,67 @@
 
                 <v-btn
                   type="submit"
-                  color="primary"
+                  color="black"
                   block
                   size="large"
-                  rounded="lg"
+                  rounded="pill"
                 >
-                  Subscribe
-                  <v-icon end>mdi-send</v-icon>
+                  JOIN THE COMMUNITY
+                  <v-icon end>mdi-arrow-right</v-icon>
                 </v-btn>
               </v-form>
             </v-col>
           </v-row>
-        </v-card>
-      </v-container>
+        </v-container>
+      </section>
 
       <!-- FOOTER -->
-      <v-footer color="grey-darken-4" class="text-white">
-        <v-container class="text-center py-6">
-          <h3 class="text-h5 font-weight-bold mb-2">ShopKart</h3>
+      <v-footer class="main-footer">
+        <v-container class="py-10">
+          <v-row>
+            <v-col cols="12" md="6">
+              <div class="footer-logo">NN.</div>
 
-          <p class="text-body-2 text-grey-lighten-1">
-            Your simple and convenient online shopping destination.
-          </p>
+              <p class="footer-description">
+                Everyday essentials.<br />
+                Timeless style. Your way.
+              </p>
+            </v-col>
 
-          <v-divider class="my-4" color="grey" />
+            <v-col cols="6" md="3">
+              <h4>EXPLORE</h4>
 
-          <p class="text-caption">
-            © {{ new Date().getFullYear() }} ShopKart. All rights reserved.
-          </p>
+              <div class="footer-links">
+                <NuxtLink to="/">Home</NuxtLink>
+                <NuxtLink to="/products">Shop</NuxtLink>
+              </div>
+            </v-col>
+
+            <v-col cols="6" md="3">
+              <h4>ABOUT</h4>
+
+              <div class="footer-links">
+                <a href="#top">Our Collection</a>
+                <a href="#top">Back to Top</a>
+              </div>
+            </v-col>
+          </v-row>
+
+          <v-divider color="#555" class="my-6" />
+
+          <div class="footer-bottom">
+            © {{ new Date().getFullYear() }} NOOK / NEST. ALL RIGHTS RESERVED.
+          </div>
         </v-container>
       </v-footer>
 
-      <!-- CART NOTIFICATION -->
-      <v-snackbar v-model="showCartMessage" color="success" timeout="2000">
+      <!-- SNACKBAR -->
+      <v-snackbar
+        v-model="showCartMessage"
+        color="black"
+        timeout="2500"
+        rounded="lg"
+      >
         {{ cartMessage }}
       </v-snackbar>
     </div>
@@ -514,7 +683,23 @@
 </template>
 
 <script setup lang="ts">
-// STRAPI CONFIGURATION
+// SEO
+useHead({
+  title: "NOOK / NEST | Move Your Way",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Discover everyday essentials and timeless finds at NOOK / NEST.",
+    },
+    {
+      name: "theme-color",
+      content: "#F4F4F0",
+    },
+  ],
+});
+
+// STRAPI
 const config = useRuntimeConfig();
 const STRAPI_URL = config.public.strapiUrl;
 
@@ -536,19 +721,22 @@ interface CartItem extends Product {
   quantity: number;
 }
 
-// SEARCH AND CATEGORY STATE
+// SEARCH
 const searchQuery = ref("");
 const selectedCategory = ref("All");
 
-// CART STATE
+// CART
 const cartDrawer = ref(false);
 const cart = ref<CartItem[]>([]);
 
-// NOTIFICATION STATE
+// MOBILE NAVIGATION
+const mobileMenu = ref(false);
+
+// NOTIFICATION
 const showCartMessage = ref(false);
 const cartMessage = ref("");
 
-// FETCH PRODUCTS FROM STRAPI
+// FETCH PRODUCTS
 const {
   data: response,
   pending,
@@ -563,12 +751,12 @@ const {
   },
 });
 
-// PRODUCT DATA
+// PRODUCTS
 const products = computed(() => {
   return response.value?.data ?? [];
 });
 
-// UNIQUE CATEGORIES
+// CATEGORIES
 const categories = computed(() => {
   return [
     ...new Set(
@@ -598,7 +786,7 @@ const filteredProducts = computed(() => {
     .slice(0, 8);
 });
 
-// CART ITEM COUNT
+// CART COUNT
 const cartItemCount = computed(() => {
   return cart.value.reduce((total, item) => total + item.quantity, 0);
 });
@@ -617,19 +805,18 @@ function addToCart(product: Product) {
     (item) => item.documentId === product.documentId,
   );
 
-  // Reject inactive products
   if (!product.is_active) {
     cartMessage.value = "This product is unavailable.";
     showCartMessage.value = true;
     return;
   }
 
-  // Reject out-of-stock products
   if (product.stock <= 0) {
     cartMessage.value = "This product is out of stock.";
     showCartMessage.value = true;
     return;
   }
+
   if (existingItem) {
     if (existingItem.quantity >= product.stock) {
       cartMessage.value = "Maximum available stock reached.";
@@ -639,19 +826,17 @@ function addToCart(product: Product) {
 
     existingItem.quantity++;
   } else {
-    if (product.stock <= 0) return;
-
     cart.value.push({
       ...product,
       quantity: 1,
     });
   }
 
-  cartMessage.value = `${product.name} added to cart!`;
+  cartMessage.value = `${product.name} added to your bag!`;
   showCartMessage.value = true;
 }
 
-// INCREASE QUANTITY
+// INCREASE
 function increaseQuantity(documentId: string) {
   const item = cart.value.find((item) => item.documentId === documentId);
 
@@ -662,7 +847,7 @@ function increaseQuantity(documentId: string) {
   }
 }
 
-// DECREASE QUANTITY
+// DECREASE
 function decreaseQuantity(documentId: string) {
   const item = cart.value.find((item) => item.documentId === documentId);
 
@@ -673,17 +858,17 @@ function decreaseQuantity(documentId: string) {
   }
 }
 
-// REMOVE ITEM
+// REMOVE
 function removeFromCart(documentId: string) {
   cart.value = cart.value.filter((item) => item.documentId !== documentId);
 }
 
-// CLEAR CART
+// CLEAR
 function clearCart() {
   cart.value = [];
 }
 
-// GET PRODUCT IMAGE URL
+// IMAGE URL
 function getImageUrl(image: any): string {
   const imageData = Array.isArray(image) ? image[0] : image;
 
@@ -709,10 +894,9 @@ function formatPrice(price: number): string {
   }).format(price || 0);
 }
 
-// WISHLIST STATE
+// WISHLIST
 const wishlist = ref<string[]>([]);
 
-// TOGGLE WISHLIST
 function toggleWishlist(product: Product) {
   const productId = product.documentId;
 
@@ -729,15 +913,13 @@ function toggleWishlist(product: Product) {
   showCartMessage.value = true;
 }
 
-// CHECK WISHLIST
 function isWishlisted(product: Product): boolean {
   return wishlist.value.includes(product.documentId);
 }
 
-// NEWSLETTER STATE
+// NEWSLETTER
 const newsletterEmail = ref("");
 
-// EMAIL VALIDATION
 const emailRules = [
   (value: string) => !!value || "Email is required.",
   (value: string) =>
@@ -745,7 +927,6 @@ const emailRules = [
     "Please enter a valid email address.",
 ];
 
-// NEWSLETTER SUBSCRIBE
 function subscribeNewsletter() {
   if (
     !newsletterEmail.value ||
@@ -756,40 +937,637 @@ function subscribeNewsletter() {
     return;
   }
 
-  cartMessage.value = "Thank you for subscribing!";
+  cartMessage.value = "Welcome to the NOOK / NEST community!";
   showCartMessage.value = true;
 
   newsletterEmail.value = "";
 }
-
 </script>
 
 <style scoped>
-.hero-section {
-  background: linear-gradient(120deg, #1565c0, #42a5f5);
-  color: white;
+/* BASE */
+.nike-style {
+  background: #f4f4f0;
+  color: #111111;
+  min-height: 100vh;
 }
 
-.image-placeholder {
-  height: 200px;
-  background-color: #eeeeee;
+.loading-page {
+  min-height: 100vh;
+  padding: 40px;
+}
+
+/* ANNOUNCEMENT */
+.announcement-bar {
+  background: #111111;
+  color: white;
+  text-align: center;
+  padding: 9px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+/* NAVIGATION */
+.main-navbar {
+  border-bottom: 1px solid #e6e6e0;
+  position: sticky !important;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-container {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.brand-logo {
+  color: #111;
+  text-decoration: none;
+  font-size: 37px;
+  font-weight: 1000;
+  letter-spacing: -4px;
+  line-height: 1;
+}
+
+.desktop-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktop-navigation :deep(.v-btn) {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.desktop-cart {
+  display: flex;
+  align-items: center;
+}
+
+.mobile-menu-button {
+  display: none;
+}
+
+/* MOBILE DRAWER */
+.mobile-navigation {
+  background: #f4f4f0;
+}
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.mobile-menu-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.mobile-menu-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  color: #111;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  border-bottom: 1px solid #deded8;
+}
+
+.mobile-menu-links a:hover {
+  opacity: 0.6;
+}
+
+.mobile-cart-link {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 20px 0;
+  color: #111;
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.mobile-menu-footer {
+  padding: 20px;
+  color: #888;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  border-top: 1px solid #deded8;
+}
+
+.brand-logo {
+  color: #111111;
+  text-decoration: none;
+  font-size: 37px;
+  font-weight: 1000;
+  letter-spacing: -4px;
+  line-height: 1;
+}
+
+.desktop-navigation {
+  display: flex;
+  align-items: center;
+}
+
+.search-panel {
+  max-width: 800px;
+}
+
+/* SMOOTH SCROLL */
+:global(html) {
+  scroll-behavior: smooth;
+}
+
+#products,
+#categories,
+#top {
+  scroll-margin-top: 85px;
+}
+
+/* HERO CAROUSEL */
+.hero-section {
+  width: 100%;
+  overflow: hidden;
+}
+
+.hero-slide {
+  position: relative;
+  min-height: 540px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  padding: 60px 9%;
+  background-size: cover;
+  background-position: center;
+}
+
+/* SLIDE BACKGROUNDS */
+.slide-one {
+  background-image: url("https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1800&q=85");
+  background-position: center 35%;
+}
+
+.slide-two {
+  background-image: url("https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1800&q=85");
+  background-position: center;
+}
+
+.slide-three {
+  background-image: url("https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1800&q=85");
+  background-position: center;
+}
+
+/* OVERLAY */
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.78),
+    rgba(0, 0, 0, 0.32),
+    rgba(0, 0, 0, 0.05)
+  );
+}
+
+/* HERO CONTENT */
+.hero-content {
+  position: relative;
+  z-index: 2;
+  color: white;
+  max-width: 650px;
+}
+
+.hero-content h1 {
+  font-size: clamp(75px, 12vw, 145px);
+  font-weight: 1000;
+  line-height: 0.82;
+  letter-spacing: -8px;
+  margin-top: 24px;
+}
+
+.hero-content p {
+  max-width: 420px;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.hero-bottom-label {
+  position: absolute;
+  right: 30px;
+  bottom: 22px;
+  z-index: 2;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.hero-button {
+  color: #111 !important;
+  font-weight: 800;
+}
+
+/* PRODUCT SEARCH */
+.product-search-area {
+  margin-top: 28px;
+  max-width: 650px;
+}
+
+.product-search {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  background: #e9e9e4;
+  border: 1px solid transparent;
+  padding: 0 18px;
+  min-height: 58px;
+  transition: all 0.25s ease;
+}
+
+.product-search:focus-within {
+  background: #fff;
+  border-color: #111;
+}
+
+.product-search-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #111;
+  font-size: 14px;
+  font-family: inherit;
+  height: 56px;
+}
+
+.product-search-input::placeholder {
+  color: #888;
+}
+
+.search-clear {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #555;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.cart-drawer {
-  max-width: 100vw;
+.search-caption {
+  display: block;
+  margin-top: 9px;
+  color: #888;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
 }
 
-.product-image-container {
+.product-category-list {
+  margin-top: 22px;
+}
+
+@media (max-width: 600px) {
+  .desktop-navigation,
+  .desktop-cart {
+    display: none !important;
+  }
+
+  .mobile-menu-button {
+    display: inline-flex !important;
+  }
+
+  .brand-logo {
+    font-size: 34px;
+  }
+}
+.hero-content {
+  color: white;
   position: relative;
+  z-index: 2;
+  max-width: 650px;
+}
+
+.hero-eyebrow,
+.eyebrow {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.hero-content h1 {
+  font-size: clamp(75px, 12vw, 145px);
+  font-weight: 1000;
+  line-height: 0.82;
+  letter-spacing: -8px;
+  margin-top: 24px;
+}
+
+.hero-content p {
+  max-width: 420px;
+  font-size: 16px;
+  line-height: 1.7;
+  margin-top: 28px;
+  margin-bottom: 28px;
+}
+
+.hero-button {
+  color: #111111 !important;
+  font-weight: 800;
+}
+
+.hero-bottom-label {
+  position: absolute;
+  right: 30px;
+  bottom: 22px;
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* SECTIONS */
+.section-spacing {
+  padding-top: 55px;
+}
+
+.section-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.section-header h2 {
+  font-size: clamp(25px, 4vw, 36px);
+  font-weight: 1000;
+  letter-spacing: -1.5px;
+  margin-top: 8px;
+}
+
+.section-header p {
+  color: #777777;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+/* PROMOTION */
+.promo-section {
+  background: #191919;
+  color: white;
+  padding: 55px;
+  min-height: 280px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.light-eyebrow {
+  color: #bdbdbd;
+}
+
+.promo-section h2 {
+  font-size: clamp(32px, 5vw, 55px);
+  line-height: 1;
+  font-weight: 1000;
+  letter-spacing: -2px;
+  margin-top: 18px;
+}
+
+.promo-section p {
+  color: #cccccc;
+  margin-top: 15px;
+  margin-bottom: 25px;
+  max-width: 430px;
+  line-height: 1.7;
+}
+
+/* PRODUCT CARDS */
+.product-card {
+  background: transparent;
+}
+
+.product-image {
+  position: relative;
+  background: #e7e7e2;
+  overflow: hidden;
+}
+
+.product-image :deep(.v-img img) {
+  transition: transform 0.4s ease;
+}
+
+.product-card:hover .product-image :deep(.v-img img) {
+  transform: scale(1.05);
+}
+
+.image-placeholder {
+  height: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .wishlist-button {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 12px;
+  right: 12px;
   z-index: 2;
+}
+
+.product-tag {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  background: white;
+  color: #111111;
+  padding: 7px 11px;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.out-of-stock {
+  background: #111111;
+  color: white;
+}
+
+.product-name {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.product-category {
+  color: #777777;
+  font-size: 11px;
+  margin-top: 5px;
+}
+
+.product-price {
+  font-size: 14px;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.product-description {
+  color: #777777;
+  font-size: 12px;
+  line-height: 1.6;
+  margin-top: 12px;
+  min-height: 38px;
+}
+
+/* NEWSLETTER */
+.newsletter-section {
+  background: #e4e4df;
+}
+
+.newsletter-section h2 {
+  font-size: clamp(38px, 6vw, 65px);
+  line-height: 0.95;
+  font-weight: 1000;
+  letter-spacing: -3px;
+  margin-top: 18px;
+}
+
+.newsletter-section p {
+  color: #555555;
+  margin-top: 18px;
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+/* FOOTER */
+.main-footer {
+  background: #111111;
+  color: white;
+}
+
+.footer-logo {
+  font-size: 65px;
+  font-weight: 1000;
+  letter-spacing: -7px;
+}
+
+.footer-description {
+  color: #aaaaaa;
+  line-height: 1.8;
+  font-size: 13px;
+}
+
+.main-footer h4 {
+  font-size: 12px;
+  letter-spacing: 1px;
+  margin-bottom: 18px;
+}
+
+.footer-links {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #aaaaaa;
+  font-size: 13px;
+}
+
+.footer-links a:hover {
+  color: white;
+}
+
+.footer-bottom {
+  color: #888888;
+  font-size: 10px;
+  letter-spacing: 1px;
+}
+
+/* CART */
+.cart-drawer {
+  max-width: 100vw;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 55px 25px;
+  color: #777777;
+}
+
+/* MOBILE */
+@media (max-width: 600px) {
+  .desktop-navigation {
+    display: none;
+  }
+
+  .hero-image {
+    min-height: 490px;
+    padding: 45px 25px;
+    background-position: 60% center;
+  }
+
+  .hero-content h1 {
+    font-size: 78px;
+    letter-spacing: -5px;
+  }
+
+  .hero-content p {
+    font-size: 14px;
+  }
+
+  .hero-bottom-label {
+    font-size: 8px;
+    right: 15px;
+  }
+
+  .promo-section {
+    padding: 30px 23px;
+  }
+
+  .promo-section > :deep(.v-icon) {
+    display: none;
+  }
+
+  .section-spacing {
+    padding-top: 38px;
+  }
+
+  .newsletter-section h2 {
+    font-size: 45px;
+  }
 }
 </style>

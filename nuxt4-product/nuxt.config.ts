@@ -11,4 +11,3 @@ export default defineNuxtConfig({
     'vuetify-nuxt-module'
   ]
 })
-
