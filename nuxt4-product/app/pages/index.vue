@@ -125,7 +125,7 @@
           <div>
             <span class="cart-eyebrow">Mikē — YOUR SELECTION</span>
             <h2>
-              YOUR BAG <span>({{ cartItemCount }})</span>
+              YOUR CART <span>({{ cartItemCount }})</span>
             </h2>
           </div>
 
