@@ -44,7 +44,7 @@
               color="black"
             >
               <v-btn icon variant="text" @click="cartDrawer = true">
-                CART
+                <v-icon size="25">mdi-cart-outline</v-icon>
               </v-btn>
             </v-badge>
           </div>
