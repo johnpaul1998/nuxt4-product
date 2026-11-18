@@ -1108,7 +1108,7 @@ const checkoutErrors = reactive({
 // OPEN CHECKOUT
 function openCheckout() {
   if (cart.value.length === 0) {
-    cartMessage.value = "Your bag is empty.";
+    cartMessage.value = "Your cart is empty.";
     showCartMessage.value = true;
     return;
   }
