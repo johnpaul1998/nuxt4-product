@@ -109,7 +109,7 @@
         </div>
 
         <template #append>
-          <div class="mobile-menu-footer">J / P — MOVE YOUR WAY.</div>
+          <div class="mobile-menu-footer">Mikē</div>
         </template>
       </v-navigation-drawer>
 
@@ -118,15 +118,14 @@
         v-model="cartDrawer"
         location="right"
         temporary
-        width="420"
+        width="480"
         class="cart-drawer"
       >
         <div class="cart-header">
           <div>
-            <span class="cart-header-eyebrow">J / P</span>
+            <span class="cart-eyebrow">Mikē — YOUR SELECTION</span>
             <h2>
-              YOUR BAG
-              <span class="cart-count">({{ cartItemCount }})</span>
+              YOUR BAG <span>({{ cartItemCount }})</span>
             </h2>
           </div>
 
@@ -137,9 +136,9 @@
 
         <!-- EMPTY CART -->
         <div v-if="cart.length === 0" class="empty-cart">
-          <v-icon size="75">mdi-shopping-bag-outline</v-icon>
-          <h3 class="mt-4">Your bag is empty.</h3>
-          <p class="mt-2">Find something worth wearing.</p>
+          <v-icon size="65" color="#aaa">mdi-shopping-outline</v-icon>
+          <h3>Nothing here yet.</h3>
+          <p>Your next favorite piece is waiting.</p>
 
           <v-btn
             to="/products"
@@ -148,145 +147,141 @@
             class="mt-5"
             @click="cartDrawer = false"
           >
-            START SHOPPING
+            EXPLORE COLLECTION
           </v-btn>
         </div>
 
         <!-- CART ITEMS -->
         <div v-else class="cart-content">
           <div class="cart-items">
-            <v-card
-              v-for="item in cart"
-              :key="item.documentId"
-              variant="flat"
-              class="cart-product-card mb-4"
-            >
-              <v-card-text class="pa-3">
-                <v-row align="center" no-gutters>
-                  <v-col cols="4">
-                    <div class="cart-image-wrapper">
-                      <v-img
-                        v-if="getImageUrl(item.image)"
-                        :src="getImageUrl(item.image)"
-                        height="125"
-                        cover
-                      />
-                      <div v-else class="cart-image-placeholder">
-                        <v-icon size="30">mdi-image-outline</v-icon>
-                      </div>
-                    </div>
-                  </v-col>
+            <div v-for="item in cart" :key="item.documentId" class="cart-item">
+              <div class="cart-item-image">
+                <v-img
+                  v-if="getImageUrl(item.image)"
+                  :src="getImageUrl(item.image)"
+                  height="155"
+                  cover
+                />
 
-                  <v-col cols="8" class="pl-4">
-                    <div class="d-flex justify-space-between align-start">
-                      <div class="flex-grow-1 pr-2">
-                        <div class="cart-item-label">YOUR ITEM</div>
-                        <div class="cart-product-name">{{ item.name }}</div>
-                      </div>
+                <v-icon v-else size="35">mdi-image-outline</v-icon>
+              </div>
 
-                      <v-btn
-                        icon="mdi-trash-can-outline"
-                        size="small"
-                        variant="text"
-                        color="grey-darken-1"
-                        @click="removeFromCart(item.documentId)"
-                      />
-                    </div>
+              <div class="cart-item-info">
+                <div class="d-flex justify-space-between align-start">
+                  <div>
+                    <span class="cart-item-category">
+                      {{ item.category || "COLLECTION" }}
+                    </span>
 
-                    <div class="cart-product-price mt-2">
-                      {{ formatPrice(item.price * item.quantity) }}
-                    </div>
+                    <h3>{{ item.name }}</h3>
+                  </div>
 
-                    <div class="cart-unit-price">
-                      {{ formatPrice(item.price) }} / item
-                    </div>
+                  <v-btn
+                    icon="mdi-close"
+                    size="x-small"
+                    variant="text"
+                    color="grey"
+                    @click="removeFromCart(item.documentId)"
+                  />
+                </div>
 
-                    <div
-                      class="d-flex align-center justify-space-between mt-3 flex-wrap ga-2"
+                <div class="cart-item-price">
+                  {{ formatPrice(item.price) }}
+                </div>
+
+                <div class="cart-item-bottom">
+                  <div class="quantity-control">
+                    <button
+                      :disabled="item.quantity <= 1"
+                      @click="decreaseQuantity(item.documentId)"
                     >
-                      <div class="quantity-control">
-                        <v-btn
-                          icon="mdi-minus"
-                          size="x-small"
-                          variant="text"
-                          :disabled="item.quantity <= 1"
-                          @click="decreaseQuantity(item.documentId)"
-                        />
+                      −
+                    </button>
 
-                        <span class="quantity-number">{{ item.quantity }}</span>
+                    <span>{{ item.quantity }}</span>
 
-                        <v-btn
-                          icon="mdi-plus"
-                          size="x-small"
-                          variant="text"
-                          :disabled="item.quantity >= item.stock"
-                          @click="increaseQuantity(item.documentId)"
-                        />
-                      </div>
+                    <button
+                      :disabled="item.quantity >= item.stock"
+                      @click="increaseQuantity(item.documentId)"
+                    >
+                      +
+                    </button>
+                  </div>
 
-                      <span class="cart-stock-label">
-                        {{ item.stock }} available
-                      </span>
-                    </div>
-                  </v-col>
-                </v-row>
-              </v-card-text>
-            </v-card>
+                  <span class="cart-item-subtotal">
+                    {{ formatPrice(item.price * item.quantity) }}
+                  </span>
+                </div>
+
+                <span class="cart-stock"> {{ item.stock }} AVAILABLE </span>
+              </div>
+            </div>
           </div>
 
-          <!-- CART SUMMARY -->
+          <!-- SUMMARY -->
           <div class="cart-summary">
-            <v-divider class="mb-4" />
-
-            <div class="d-flex justify-space-between mb-4">
-              <strong>SUBTOTAL</strong>
+            <div class="cart-summary-top">
+              <span>SUBTOTAL</span>
               <strong>{{ formatPrice(cartTotal) }}</strong>
             </div>
 
-            <v-btn block variant="outlined" class="mb-3" @click="clearCart">
-              CLEAR CART
-            </v-btn>
+            <p>Shipping and taxes calculated at checkout.</p>
 
-            <v-btn block color="black" size="large" @click="openCheckout">
-              CHECKOUT
+            <v-btn
+              block
+              color="black"
+              height="56"
+              rounded="pill"
+              class="cart-checkout-btn"
+              @click="openCheckout"
+            >
+              PROCEED TO CHECKOUT
               <v-icon end>mdi-arrow-right</v-icon>
             </v-btn>
 
-            <p class="text-caption text-center mt-3">Checkout coming soon.</p>
+            <button class="continue-shopping" @click="cartDrawer = false">
+              CONTINUE SHOPPING
+            </button>
           </div>
         </div>
       </v-navigation-drawer>
 
       <!-- CHECKOUT DIALOG -->
-      <v-dialog v-model="checkoutDialog" max-width="1050" scrollable>
-        <v-card rounded="lg" class="checkout-card">
+      <v-dialog v-model="checkoutDialog" max-width="1100" scrollable>
+        <v-card class="checkout-card" rounded="xl">
+          <!-- HEADER -->
           <div class="checkout-header">
             <div>
-              <span class="cart-header-eyebrow">J / P — CHECKOUT</span>
-              <h2>COMPLETE YOUR ORDER.</h2>
+              <span class="checkout-eyebrow">Mikē — SECURE CHECKOUT</span>
+              <h2>ALMOST YOURS.</h2>
+              <p>Complete your details to place your order.</p>
             </div>
+
             <v-btn
               icon="mdi-close"
               variant="text"
-              @click="checkoutDialog = false"
               :disabled="isCheckingOut"
+              @click="checkoutDialog = false"
             />
           </div>
 
           <v-divider />
 
-          <v-card-text class="pa-5 pa-md-8">
+          <v-card-text class="checkout-body">
             <v-row>
               <!-- CUSTOMER INFORMATION -->
-              <v-col cols="12" md="6">
-                <h3 class="checkout-section-title mb-5">
-                  CUSTOMER INFORMATION
-                </h3>
+              <v-col cols="12" md="7" class="checkout-form-column">
+                <div class="checkout-step">
+                  <span>01</span>
+                  <h3>YOUR DETAILS</h3>
+                </div>
 
                 <v-text-field
                   v-model="customer.name"
                   label="Full Name"
+                  placeholder="Enter your full name"
                   variant="outlined"
+                  rounded="lg"
                   :disabled="isCheckingOut"
                   :error-messages="checkoutErrors.name"
                 />
@@ -294,8 +289,10 @@
                 <v-text-field
                   v-model="customer.email"
                   label="Email Address"
+                  placeholder="you@example.com"
                   type="email"
                   variant="outlined"
+                  rounded="lg"
                   :disabled="isCheckingOut"
                   :error-messages="checkoutErrors.email"
                 />
@@ -303,7 +300,9 @@
                 <v-text-field
                   v-model="customer.phone"
                   label="Phone Number"
+                  placeholder="09XXXXXXXXX"
                   variant="outlined"
+                  rounded="lg"
                   :disabled="isCheckingOut"
                   :error-messages="checkoutErrors.phone"
                 />
@@ -311,99 +310,148 @@
                 <v-textarea
                   v-model="customer.address"
                   label="Complete Shipping Address"
+                  placeholder="House number, street, barangay, city, province..."
                   variant="outlined"
+                  rounded="lg"
                   rows="3"
                   :disabled="isCheckingOut"
                   :error-messages="checkoutErrors.address"
                 />
 
-                <h3 class="checkout-section-title mb-4 mt-3">PAYMENT METHOD</h3>
+                <div class="checkout-step mt-5">
+                  <span>02</span>
+                  <h3>PAYMENT METHOD</h3>
+                </div>
 
                 <v-radio-group
                   v-model="customer.paymentMethod"
                   :disabled="isCheckingOut"
                   :error-messages="checkoutErrors.paymentMethod"
+                  hide-details="auto"
                 >
-                  <v-radio label="Cash on Delivery (COD)" value="COD" />
-                  <v-radio label="GCash" value="GCash" />
+                  <div class="payment-option">
+                    <v-radio value="COD">
+                      <template #label>
+                        <div class="payment-label">
+                          <v-icon size="25">mdi-cash-multiple</v-icon>
+                          <div>
+                            <strong>Cash on Delivery</strong>
+                            <small>Pay when your order arrives.</small>
+                          </div>
+                        </div>
+                      </template>
+                    </v-radio>
+                  </div>
+
+                  <div class="payment-option mt-3">
+                    <v-radio value="GCash">
+                      <template #label>
+                        <div class="payment-label">
+                          <v-icon size="25">mdi-cellphone</v-icon>
+                          <div>
+                            <strong>GCash</strong>
+                            <small>Mobile wallet payment.</small>
+                          </div>
+                        </div>
+                      </template>
+                    </v-radio>
+                  </div>
                 </v-radio-group>
               </v-col>
 
               <!-- ORDER SUMMARY -->
-              <v-col cols="12" md="6">
-                <h3 class="checkout-section-title mb-5">ORDER SUMMARY</h3>
+              <v-col cols="12" md="5">
+                <div class="checkout-summary">
+                  <span class="checkout-summary-eyebrow"> YOUR SELECTION </span>
 
-                <div
-                  v-for="item in cart"
-                  :key="item.documentId"
-                  class="checkout-item"
-                >
-                  <div class="checkout-item-image">
-                    <v-img
-                      v-if="getImageUrl(item.image)"
-                      :src="getImageUrl(item.image)"
-                      width="65"
-                      height="65"
-                      cover
-                    />
-                    <v-icon v-else size="30">mdi-image-outline</v-icon>
-                  </div>
+                  <h3>ORDER SUMMARY</h3>
 
-                  <div class="flex-grow-1">
-                    <div class="font-weight-bold">{{ item.name }}</div>
-                    <div class="text-caption text-grey">
-                      {{ formatPrice(item.price) }} × {{ item.quantity }}
+                  <div
+                    v-for="item in cart"
+                    :key="item.documentId"
+                    class="checkout-product"
+                  >
+                    <div class="checkout-product-image">
+                      <v-img
+                        v-if="getImageUrl(item.image)"
+                        :src="getImageUrl(item.image)"
+                        width="75"
+                        height="85"
+                        cover
+                      />
+
+                      <v-icon v-else>mdi-image-outline</v-icon>
                     </div>
+
+                    <div class="checkout-product-info">
+                      <strong>{{ item.name }}</strong>
+
+                      <span>
+                        {{ formatPrice(item.price) }} × {{ item.quantity }}
+                      </span>
+                    </div>
+
+                    <strong class="checkout-product-total">
+                      {{ formatPrice(item.price * item.quantity) }}
+                    </strong>
                   </div>
 
-                  <strong>
-                    {{ formatPrice(item.price * item.quantity) }}
-                  </strong>
+                  <v-divider class="my-5" />
+
+                  <div class="summary-line">
+                    <span>TOTAL ITEMS</span>
+                    <strong>{{ cartItemCount }}</strong>
+                  </div>
+
+                  <div class="summary-line">
+                    <span>SUBTOTAL</span>
+                    <strong>{{ formatPrice(cartTotal) }}</strong>
+                  </div>
+
+                  <div class="summary-line">
+                    <span>SHIPPING</span>
+                    <strong>Calculated separately</strong>
+                  </div>
+
+                  <v-divider class="my-5" />
+
+                  <div class="checkout-total">
+                    <span>TOTAL</span>
+                    <strong>{{ formatPrice(cartTotal) }}</strong>
+                  </div>
+
+                  <p class="checkout-note">
+                    Please review your information before placing your order.
+                  </p>
+
+                  <v-alert
+                    v-if="checkoutError"
+                    type="error"
+                    variant="tonal"
+                    class="mt-4"
+                  >
+                    {{ checkoutError }}
+                  </v-alert>
+
+                  <v-btn
+                    block
+                    color="black"
+                    height="56"
+                    rounded="pill"
+                    class="mt-5"
+                    :loading="isCheckingOut"
+                    :disabled="cart.length === 0"
+                    @click="submitCheckout"
+                  >
+                    PLACE YOUR ORDER
+                    <v-icon end>mdi-arrow-right</v-icon>
+                  </v-btn>
+
+                  <div class="secure-checkout">
+                    <v-icon size="16">mdi-shield-check-outline</v-icon>
+                    YOUR ORDER DETAILS ARE PROTECTED
+                  </div>
                 </div>
-
-                <v-divider class="my-5" />
-
-                <div class="d-flex justify-space-between mb-3">
-                  <span>Total Items</span>
-                  <strong>{{ cartItemCount }}</strong>
-                </div>
-
-                <div class="d-flex justify-space-between mb-3">
-                  <span>Subtotal</span>
-                  <strong>{{ formatPrice(cartTotal) }}</strong>
-                </div>
-
-                <div class="d-flex justify-space-between text-h6 mt-5">
-                  <strong>TOTAL</strong>
-                  <strong>{{ formatPrice(cartTotal) }}</strong>
-                </div>
-
-                <v-alert
-                  v-if="checkoutError"
-                  type="error"
-                  variant="tonal"
-                  class="mt-5"
-                >
-                  {{ checkoutError }}
-                </v-alert>
-
-                <v-btn
-                  block
-                  color="black"
-                  size="x-large"
-                  rounded="pill"
-                  class="mt-6"
-                  :loading="isCheckingOut"
-                  :disabled="cart.length === 0"
-                  @click="submitCheckout"
-                >
-                  PLACE ORDER
-                  <v-icon end>mdi-arrow-right</v-icon>
-                </v-btn>
-
-                <p class="text-caption text-grey text-center mt-3">
-                  Please review your information before placing your order.
-                </p>
               </v-col>
             </v-row>
           </v-card-text>
@@ -418,7 +466,7 @@
           </div>
 
           <v-card-text class="text-center pa-8">
-            <span class="success-eyebrow">J / P — ORDER CONFIRMED</span>
+            <span class="success-eyebrow">Mikē — ORDER CONFIRMED</span>
 
             <h2 class="success-title mt-4">THANK YOU!</h2>
 
@@ -440,7 +488,7 @@
               rounded="lg"
               class="mt-5 text-left"
             >
-              Thank you for shopping with J / P. Your order is now being
+              Thank you for shopping with Mikē. Your order is now being
               processed.
             </v-alert>
 
@@ -841,7 +889,7 @@
           <v-divider color="#555" class="my-6" />
 
           <div class="footer-bottom">
-            © {{ new Date().getFullYear() }} J / P. ALL RIGHTS RESERVED.
+            © {{ new Date().getFullYear() }} Mikē. ALL RIGHTS RESERVED.
           </div>
         </v-container>
       </v-footer>
@@ -862,11 +910,11 @@
 <script setup lang="ts">
 // SEO
 useHead({
-  title: "J / P | Move Your Way",
+  title: "Mikē",
   meta: [
     {
       name: "description",
-      content: "Discover everyday essentials and timeless finds at J / P.",
+      content: "Discover everyday essentials and timeless finds at Mikē.",
     },
     {
       name: "theme-color",
@@ -1363,7 +1411,7 @@ function subscribeNewsletter() {
     return;
   }
 
-  cartMessage.value = "Welcome to the J / P community!";
+  cartMessage.value = "Welcome to the Mikē community!";
   showCartMessage.value = true;
   newsletterEmail.value = "";
 }
@@ -1915,6 +1963,459 @@ function subscribeNewsletter() {
   opacity: 1 !important;
 }
 
+
+/* =================================
+   PREMIUM CART DRAWER
+================================= */
+
+.cart-drawer {
+  max-width: 100vw;
+  background: #f8f8f4;
+}
+
+.cart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 25px;
+}
+
+.cart-eyebrow,
+.checkout-eyebrow {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #999;
+}
+
+.cart-header h2 {
+  font-size: 27px;
+  font-weight: 1000;
+  letter-spacing: -1.5px;
+  margin-top: 8px;
+}
+
+.cart-header h2 span {
+  color: #999;
+  font-size: 16px;
+}
+
+.cart-content {
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 95px);
+  min-height: 0;
+}
+
+.cart-items {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 125px 1fr;
+  gap: 16px;
+  padding-bottom: 22px;
+  margin-bottom: 22px;
+  border-bottom: 1px solid #e5e5df;
+}
+
+.cart-item-image {
+  height: 155px;
+  background: #ededE8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.cart-item-info {
+  min-width: 0;
+}
+
+.cart-item-category {
+  color: #999;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.3px;
+}
+
+.cart-item-info h3 {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-top: 5px;
+}
+
+.cart-item-price {
+  font-size: 15px;
+  font-weight: 900;
+  margin-top: 13px;
+}
+
+.cart-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.quantity-control {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border: 1px solid #ddd;
+  border-radius: 30px;
+  padding: 5px 10px;
+  background: white;
+}
+
+.quantity-control button {
+  border: none;
+  background: transparent;
+  font-size: 19px;
+  cursor: pointer;
+  color: #111;
+}
+
+.quantity-control button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.quantity-control span {
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.cart-item-subtotal {
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.cart-stock {
+  display: block;
+  margin-top: 10px;
+  font-size: 9px;
+  color: #999;
+  letter-spacing: 1px;
+  font-weight: 800;
+}
+
+.cart-summary {
+  flex-shrink: 0;
+  padding: 23px 25px;
+  background: #fff;
+  border-top: 1px solid #e5e5df;
+}
+
+.cart-summary-top {
+  display: flex;
+  justify-content: space-between;
+  font-size: 15px;
+  font-weight: 900;
+}
+
+.cart-summary p {
+  color: #999;
+  font-size: 11px;
+  margin-top: 9px;
+  margin-bottom: 20px;
+}
+
+.cart-checkout-btn {
+  font-size: 11px !important;
+  font-weight: 900 !important;
+  letter-spacing: 1px;
+}
+
+.continue-shopping {
+  display: block;
+  margin: 17px auto 0;
+  border: none;
+  background: transparent;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.empty-cart {
+  text-align: center;
+  padding: 90px 25px;
+  color: #777;
+}
+
+.empty-cart h3 {
+  color: #111;
+  font-size: 22px;
+  font-weight: 900;
+  margin-top: 20px;
+}
+
+/* =================================
+   PREMIUM CHECKOUT
+================================= */
+
+.checkout-card {
+  background: #f8f8f4;
+  overflow: hidden;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px 35px;
+}
+
+.checkout-header h2 {
+  font-size: clamp(25px, 4vw, 36px);
+  font-weight: 1000;
+  letter-spacing: -2px;
+  margin-top: 8px;
+}
+
+.checkout-header p {
+  font-size: 12px;
+  color: #888;
+  margin-top: 5px;
+}
+
+.checkout-body {
+  padding: 30px 35px !important;
+}
+
+.checkout-form-column {
+  padding-right: 35px;
+}
+
+.checkout-step {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 22px;
+}
+
+.checkout-step span {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #111;
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.checkout-step h3 {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.checkout-form-column :deep(.v-field) {
+  background: white;
+}
+
+.payment-option {
+  padding: 13px;
+  background: white;
+  border: 1px solid #e5e5df;
+  border-radius: 12px;
+}
+
+.payment-label {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: #111;
+  padding: 5px;
+}
+
+.payment-label strong,
+.payment-label small {
+  display: block;
+}
+
+.payment-label strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.payment-label small {
+  font-size: 10px;
+  color: #888;
+  margin-top: 4px;
+}
+
+/* ORDER SUMMARY */
+
+.checkout-summary {
+  background: white;
+  border: 1px solid #e9e9e3;
+  border-radius: 15px;
+  padding: 25px;
+  height: 100%;
+}
+
+.checkout-summary-eyebrow {
+  font-size: 9px;
+  color: #999;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.checkout-summary > h3 {
+  font-size: 20px;
+  font-weight: 1000;
+  letter-spacing: -0.7px;
+  margin-top: 7px;
+  margin-bottom: 20px;
+}
+
+.checkout-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.checkout-product-image {
+  width: 65px;
+  height: 75px;
+  flex-shrink: 0;
+  background: #f0f0eb;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.checkout-product-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  gap: 6px;
+}
+
+.checkout-product-info strong {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.checkout-product-info span {
+  font-size: 10px;
+  color: #999;
+}
+
+.checkout-product-total {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  font-size: 11px;
+  color: #777;
+}
+
+.summary-line strong {
+  color: #111;
+  text-align: right;
+}
+
+.checkout-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.checkout-total strong {
+  font-size: 23px;
+  letter-spacing: -1px;
+}
+
+.checkout-note {
+  color: #999;
+  font-size: 10px;
+  line-height: 1.7;
+  margin-top: 15px;
+}
+
+.secure-checkout {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+  color: #999;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  margin-top: 17px;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .cart-item {
+    grid-template-columns: 105px 1fr;
+    gap: 12px;
+  }
+
+  .cart-item-image {
+    height: 140px;
+  }
+
+  .cart-header {
+    padding: 23px 18px;
+  }
+
+  .cart-items {
+    padding: 15px;
+  }
+
+  .cart-summary {
+    padding: 18px;
+  }
+
+  .checkout-header {
+    padding: 22px 18px;
+  }
+
+  .checkout-body {
+    padding: 18px !important;
+  }
+
+  .checkout-form-column {
+    padding-right: 12px;
+  }
+
+  .checkout-summary {
+    padding: 20px 15px;
+  }
+
+  .checkout-total strong {
+    font-size: 20px;
+  }
+}
+
+
 /* ORDER SUCCESS */
 .success-card {
   background: #f9f9f6;
@@ -1974,180 +2475,6 @@ function subscribeNewsletter() {
   word-break: break-all;
 }
 
-/* CHECKOUT */
-.checkout-card {
-  background: #f9f9f6;
-}
-
-.checkout-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px;
-}
-
-.checkout-header h2 {
-  font-size: clamp(20px, 3vw, 28px);
-  font-weight: 1000;
-  letter-spacing: -1px;
-  margin-top: 5px;
-}
-
-.checkout-section-title {
-  font-size: 13px;
-  font-weight: 900;
-  letter-spacing: 1px;
-}
-
-.checkout-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid #e5e5df;
-}
-
-.checkout-item-image {
-  width: 65px;
-  height: 65px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #edede8;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-/* CART DRAWER */
-.cart-drawer {
-  max-width: 100vw;
-  background: #f9f9f6;
-}
-
-.cart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 24px 20px;
-}
-
-.cart-header-eyebrow {
-  font-size: 9px;
-  font-weight: 900;
-  letter-spacing: 2px;
-  color: #888;
-}
-
-.cart-header h2 {
-  font-size: 25px;
-  font-weight: 1000;
-  letter-spacing: -1px;
-  margin-top: 5px;
-}
-
-.cart-count {
-  color: #999;
-  font-size: 16px;
-}
-
-.cart-content {
-  display: flex;
-  flex-direction: column;
-  height: calc(100% - 90px);
-  min-height: 0;
-}
-
-.cart-items {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-  padding: 16px;
-}
-
-.cart-summary {
-  flex-shrink: 0;
-  padding: 16px 20px 24px;
-  background: #f9f9f6;
-  border-top: 1px solid #e5e5df;
-}
-
-.cart-product-card {
-  background: #fff !important;
-  border: 1px solid #eaeae5;
-  border-radius: 16px !important;
-  overflow: hidden;
-  transition: all 0.25s ease;
-}
-
-.cart-product-card:hover {
-  border-color: #c8c8bd;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
-}
-
-.cart-image-wrapper {
-  background: #f4f4f0;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.cart-image-placeholder {
-  height: 125px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #aaa;
-}
-
-.cart-item-label {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 1.2px;
-  color: #999;
-  margin-bottom: 5px;
-}
-
-.cart-product-name {
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1.4;
-  color: #222;
-}
-
-.cart-product-price {
-  font-size: 16px;
-  font-weight: 800;
-  color: #222;
-}
-
-.cart-unit-price,
-.cart-stock-label {
-  font-size: 10px;
-  color: #888;
-}
-
-.quantity-control {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  border: 1px solid #e5e5df;
-  border-radius: 30px;
-  padding: 2px 5px;
-  background: #fafaf8;
-}
-
-.quantity-number {
-  font-size: 13px;
-  font-weight: 700;
-  min-width: 20px;
-  text-align: center;
-}
-
-.empty-cart {
-  text-align: center;
-  padding: 65px 25px;
-  color: #777;
-}
 
 /* NEWSLETTER */
 .newsletter-section {
