@@ -23,7 +23,7 @@
           fluid
           class="navbar-container d-flex align-center px-5 px-md-10"
         >
-          <NuxtLink to="/" class="brand-logo">JP.</NuxtLink>
+          <NuxtLink to="/" class="brand-logo">Mikē</NuxtLink>
 
           <v-spacer />
 
@@ -859,7 +859,7 @@
         <v-container class="py-10">
           <v-row>
             <v-col cols="12" md="6">
-              <div class="footer-logo">JP.</div>
+              <div class="footer-logo">Mikē</div>
 
               <p class="footer-description">
                 Everyday essentials.<br />
