@@ -452,45 +452,32 @@ async function getProducts() {
         "pagination[pageSize]": 100,
       },
     });
-
-    console.log("FULL PRODUCT RESPONSE:", response);
-    console.log("FIRST PRODUCT:", response.data?.[0]);
-    console.log("IMAGE DATA:", response.data?.[0]?.image);
     products.value = response.data || [];
+
+    
   } catch (error) {
-    console.error("Error fetching products:", error);
-    console.log("PRODUCT RESPONSE:", response.data);
     showSnackbar("Unable to load products.", "error");
   } finally {
     loading.value = false;
   }
 }
+function updateProductState(updatedProduct) {
+  const index = products.value.findIndex(
+    (product) => product.documentId === updatedProduct.documentId,
+  );
 
-// async function getProducts() {
-//   loading.value = true;
+  if (index === -1) return;
 
-//   try {
-//     const response = await $fetch(`${STRAPI_URL}/api/products`, {
-//       query: {
-//         populate: "image",
-//         sort: "createdAt:desc",
-//         "pagination[pageSize]": 100,
-//       },
-//     });
+  const existingProduct = products.value[index];
 
-//     console.log("FULL RESPONSE:", response);
-//     console.log("FIRST PRODUCT:", response.data?.[0]);
-//     console.log("PRODUCT IMAGE:", response.data?.[0]?.image);
+  products.value[index] = {
+    ...existingProduct,
+    ...updatedProduct,
 
-//     products.value = response.data || [];
-
-//   } catch (error) {
-//     console.error("Error fetching products:", error);
-//     showSnackbar("Unable to load products.", "error");
-//   } finally {
-//     loading.value = false;
-//   }
-// }
+    // Preserve existing image if the update response has no image
+    image: updatedProduct.image ?? existingProduct.image,
+  };
+}
 onMounted(() => {
   getProducts();
 });

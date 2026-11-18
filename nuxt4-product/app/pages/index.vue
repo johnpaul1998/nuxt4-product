@@ -965,7 +965,6 @@ const {
   data: response,
   pending,
   error,
-  refresh: refreshProducts,
 } = await useFetch<{ data: Product[] }>(`${STRAPI_URL}/api/products`, {
   lazy: true,
   query: {
@@ -976,8 +975,38 @@ const {
   },
 });
 
-// PRODUCTS
-const products = computed(() => response.value?.data ?? []);
+// SHARED PRODUCTS STATE
+const products = useState<Product[]>("products", () => []);
+
+// Sync initial API response to shared state
+watch(
+  response,
+  (newResponse) => {
+    if (newResponse?.data) {
+      products.value = newResponse.data;
+    }
+  },
+  { immediate: true },
+);
+
+// UPDATE PRODUCT STATE AFTER CHECKOUT
+function updateProductState(updatedProduct: Product) {
+  const index = products.value.findIndex(
+    (product) => product.documentId === updatedProduct.documentId,
+  );
+
+  if (index === -1) return;
+
+  const existingProduct = products.value[index];
+
+  if (!existingProduct) return;
+
+  products.value[index] = {
+    ...existingProduct,
+    ...updatedProduct,
+    image: updatedProduct.image || existingProduct.image,
+  };
+}
 
 // CATEGORIES
 const categories = computed(() => {
@@ -1076,10 +1105,6 @@ function removeFromCart(documentId: string) {
   cart.value = cart.value.filter((item) => item.documentId !== documentId);
 }
 
-// CLEAR CART
-function clearCart() {
-  cart.value = [];
-}
 
 // CHECKOUT STATE
 const checkoutDialog = ref(false);
@@ -1273,55 +1298,73 @@ async function submitCheckout() {
       });
     }
 
-    // STEP 5: DEDUCT PRODUCT STOCK
+    // STEP 5: DEDUCT PRODUCT STOCK AND PRESERVE IMAGE
     for (const item of verifiedItems) {
+      // GET PRODUCT BEFORE UPDATE
       const before = await strapiRequest(
         `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
       );
 
-      console.log("BEFORE UPDATE:", {
-        name: before.data?.name,
-        stock: before.data?.stock,
-        image: before.data?.image,
-      });
+      if (!before.data) {
+        throw new Error(`Unable to fetch product: ${item.name}`);
+      }
 
       const remainingStock = item.stock - item.quantity;
+      const existingImageId = before.data.image?.id;
 
+      // UPDATE STOCK AND PRESERVE EXISTING IMAGE
       await strapiRequest(
         `/api/products/${encodeURIComponent(item.documentId)}`,
         "PUT",
         {
           data: {
             stock: remainingStock,
+
+            ...(existingImageId
+              ? {
+                  image: {
+                    connect: [existingImageId],
+                  },
+                }
+              : {}),
           },
         },
       );
 
-      const after = await strapiRequest(
+      // FETCH UPDATED PRODUCT
+      const updated = await strapiRequest(
         `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
       );
 
-      console.log("AFTER UPDATE:", {
-        name: after.data?.name,
-        stock: after.data?.stock,
-        image: after.data?.image,
-      });
-
-      if (!after.data?.image) {
-        console.error("WARNING: PRODUCT IMAGE IS MISSING AFTER UPDATE!");
+      if (!updated.data) {
+        throw new Error(`Unable to fetch updated product: ${item.name}`);
       }
-    }
-    // STEP 6: SUCCESS
 
-    console.log(
-      "PRODUCT LISTING AFTER CHECKOUT:",
-      products.value.map((product) => ({
-        name: product.name,
-        image: product.image,
-        imageUrl: getImageUrl(product.image),
-      })),
-    );
-    await refreshProducts();
+      // PRESERVE IMAGE IF NOT RETURNED BY STRAPI
+      const productWithImage = {
+        ...updated.data,
+        image: updated.data.image || before.data.image,
+      };
+
+      // UPDATE SHARED FRONTEND STATE
+      updateProductState(productWithImage);
+    }
+
+    // STEP 6: COMPLETE CHECKOUT
+    cart.value = [];
+
+    customer.name = "";
+    customer.email = "";
+    customer.phone = "";
+    customer.address = "";
+    customer.paymentMethod = "COD";
+
+    checkoutDialog.value = false;
+
+    completedOrderId.value = orderId;
+    successDialog.value = true;
+
+    // STEP 7: SUCCESS
     cart.value = [];
 
     customer.name = "";
@@ -1963,7 +2006,6 @@ function subscribeNewsletter() {
   opacity: 1 !important;
 }
 
-
 /* =================================
    PREMIUM CART DRAWER
 ================================= */
@@ -2025,7 +2067,7 @@ function subscribeNewsletter() {
 
 .cart-item-image {
   height: 155px;
-  background: #ededE8;
+  background: #edede8;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2415,7 +2457,6 @@ function subscribeNewsletter() {
   }
 }
 
-
 /* ORDER SUCCESS */
 .success-card {
   background: #f9f9f6;
@@ -2474,7 +2515,6 @@ function subscribeNewsletter() {
   color: #111;
   word-break: break-all;
 }
-
 
 /* NEWSLETTER */
 .newsletter-section {
