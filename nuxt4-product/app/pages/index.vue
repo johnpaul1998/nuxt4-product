@@ -410,6 +410,55 @@
         </v-card>
       </v-dialog>
 
+      <!-- ORDER SUCCESS DIALOG -->
+      <v-dialog v-model="successDialog" max-width="520" persistent>
+        <v-card class="success-card" rounded="xl">
+          <div class="success-icon">
+            <v-icon size="48" color="white">mdi-check</v-icon>
+          </div>
+
+          <v-card-text class="text-center pa-8">
+            <span class="success-eyebrow">J / P — ORDER CONFIRMED</span>
+
+            <h2 class="success-title mt-4">THANK YOU!</h2>
+
+            <p class="success-message mt-3">
+              Your order has been successfully placed. We appreciate your
+              purchase and can't wait for you to receive your items.
+            </p>
+
+            <v-divider class="my-6" />
+
+            <div class="order-reference">
+              <span>YOUR ORDER NUMBER</span>
+              <strong>{{ completedOrderId }}</strong>
+            </div>
+
+            <v-alert
+              type="success"
+              variant="tonal"
+              rounded="lg"
+              class="mt-5 text-left"
+            >
+              Thank you for shopping with J / P. Your order is now being
+              processed.
+            </v-alert>
+
+            <v-btn
+              block
+              color="black"
+              size="x-large"
+              rounded="pill"
+              class="mt-6"
+              @click="successDialog = false"
+            >
+              CONTINUE SHOPPING
+              <v-icon end>mdi-arrow-right</v-icon>
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
+
       <!-- HERO -->
       <section id="top" class="hero-section">
         <v-carousel
@@ -994,6 +1043,9 @@ const checkoutDialog = ref(false);
 const isCheckingOut = ref(false);
 const checkoutError = ref("");
 
+const successDialog = ref(false);
+const completedOrderId = ref("");
+
 const customer = reactive({
   name: "",
   email: "",
@@ -1237,9 +1289,8 @@ async function submitCheckout() {
 
     checkoutDialog.value = false;
 
-    cartMessage.value = `Order ${orderId} placed successfully!`;
-
-    showCartMessage.value = true;
+    completedOrderId.value = orderId;
+    successDialog.value = true;
   } catch (error: any) {
     console.error("CHECKOUT ERROR:", error);
 
@@ -1868,6 +1919,68 @@ function subscribeNewsletter() {
   border-color: #d5d5d5 !important;
   opacity: 1 !important;
 }
+
+
+
+/* ORDER SUCCESS */
+.success-card {
+  background: #f9f9f6;
+  overflow: hidden;
+}
+
+.success-icon {
+  width: 85px;
+  height: 85px;
+  border-radius: 50%;
+  background: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 35px auto 0;
+}
+
+.success-eyebrow {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: #888;
+}
+
+.success-title {
+  font-size: 42px;
+  font-weight: 1000;
+  letter-spacing: -2px;
+  color: #111;
+}
+
+.success-message {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.order-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  background: #eeeeea;
+  border-radius: 12px;
+}
+
+.order-reference span {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  color: #888;
+}
+
+.order-reference strong {
+  font-size: 19px;
+  color: #111;
+  word-break: break-all;
+}
+
 
 /* CHECKOUT */
 .checkout-card {
