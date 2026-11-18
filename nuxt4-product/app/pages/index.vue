@@ -953,8 +953,48 @@ const selectedCategory = ref("All");
 const cartDrawer = ref(false);
 const mobileMenu = ref(false);
 
+
 // CART
 const cart = ref<CartItem[]>([]);
+
+const isCartLoaded = ref(false);
+
+const CART_STORAGE_KEY = "mike-shopping-cart";
+
+// RESTORE CART AFTER COMPONENT MOUNTS
+onMounted(() => {
+  try {
+    const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+
+    if (savedCart) {
+      const parsedCart = JSON.parse(savedCart);
+
+      if (Array.isArray(parsedCart)) {
+        cart.value = parsedCart;
+      }
+    }
+  } catch (error) {
+    console.error("Unable to restore cart:", error);
+    localStorage.removeItem(CART_STORAGE_KEY);
+  }
+
+  isCartLoaded.value = true;
+});
+
+// AUTOMATICALLY SAVE CART CHANGES
+watch(
+  cart,
+  (newCart) => {
+    if (!isCartLoaded.value) return;
+
+    localStorage.setItem(
+      CART_STORAGE_KEY,
+      JSON.stringify(newCart)
+    );
+  },
+  { deep: true }
+);
+
 
 // NOTIFICATION
 const showCartMessage = ref(false);
