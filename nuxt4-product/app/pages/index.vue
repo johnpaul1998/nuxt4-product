@@ -244,7 +244,7 @@
             </div>
 
             <v-btn block variant="outlined" class="mb-3" @click="clearCart">
-              CLEAR BAG
+              CLEAR CART
             </v-btn>
 
             <v-btn block color="black" size="large" @click="openCheckout">
