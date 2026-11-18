@@ -873,6 +873,7 @@ const {
   data: response,
   pending,
   error,
+  refresh: refreshProducts,
 } = await useFetch<{ data: Product[] }>(`${STRAPI_URL}/api/products`, {
   lazy: true,
   query: {
@@ -1183,25 +1184,38 @@ async function submitCheckout() {
         `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
       );
 
-      console.log("IMAGE BEFORE STOCK UPDATE:", before.data?.image);
+      console.log("BEFORE UPDATE:", {
+        name: before.data?.name,
+        stock: before.data?.stock,
+        image: before.data?.image,
+      });
 
       const remainingStock = item.stock - item.quantity;
 
-      const updateResult = await strapiRequest(
+      await strapiRequest(
         `/api/products/${encodeURIComponent(item.documentId)}`,
         "PUT",
-        { data: { stock: remainingStock } },
+        {
+          data: {
+            stock: remainingStock,
+          },
+        },
       );
-
-      console.log("STOCK UPDATE RESPONSE:", updateResult);
 
       const after = await strapiRequest(
         `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
       );
 
-      console.log("IMAGE AFTER STOCK UPDATE:", after.data?.image);
-    }
+      console.log("AFTER UPDATE:", {
+        name: after.data?.name,
+        stock: after.data?.stock,
+        image: after.data?.image,
+      });
 
+      if (!after.data?.image) {
+        console.error("WARNING: PRODUCT IMAGE IS MISSING AFTER UPDATE!");
+      }
+    }
     // STEP 6: SUCCESS
 
     console.log(
@@ -1212,6 +1226,7 @@ async function submitCheckout() {
         imageUrl: getImageUrl(product.image),
       })),
     );
+    await refreshProducts();
     cart.value = [];
 
     customer.name = "";
