@@ -530,8 +530,8 @@
       </section>
 
       <!-- CATEGORIES -->
-      <v-container id="categories" class="section-spacing scroll-reveal">
-        <div class="section-header">
+      <v-container id="categories" class="section-spacing ">
+        <div class="section-header ">
           <div>
             <span class="eyebrow">EXPLORE THE COLLECTION</span>
             <h2>SHOP BY CATEGORY.</h2>
@@ -563,7 +563,7 @@
       <!-- PROMOTION -->
       <v-container class="section-spacing">
         <section class="promo-section scroll-reveal">
-          <div class="promo-content">
+          <div class="promo-content ">
             <span class="eyebrow light-eyebrow">THE Mikē EXPERIENCE</span>
 
             <h2>LESS ORDINARY.<br />MORE YOU.</h2>
@@ -593,10 +593,7 @@
       </v-container>
 
       <!-- PRODUCTS -->
-      <v-container
-        id="products"
-        class="section-spacing pb-12 scroll-reveal"
-      >
+      <v-container id="products" class="section-spacing pb-12">
         <div class="section-header product-section-header">
           <div>
             <span class="eyebrow">THE COLLECTION</span>
@@ -843,8 +840,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, nextTick } from "vue";
-
 useHead({
   title: "Mikē",
   meta: [
@@ -909,14 +904,11 @@ const heroSlides = [
   },
 ];
 
-// SCROLL REVEAL
+import { onMounted, onBeforeUnmount } from "vue";
+
 let revealObserver: IntersectionObserver | null = null;
 
-async function initializeScrollReveal() {
-  await nextTick();
-
-  revealObserver?.disconnect();
-
+onMounted(() => {
   revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -928,15 +920,15 @@ async function initializeScrollReveal() {
       });
     },
     {
-      threshold: 0.12,
-      rootMargin: "0px 0px -60px 0px",
-    },
+      threshold: 0.15,
+      rootMargin: "0px 0px -50px 0px",
+    }
   );
 
   document.querySelectorAll(".scroll-reveal").forEach((element) => {
     revealObserver?.observe(element);
   });
-}
+});
 
 onBeforeUnmount(() => {
   revealObserver?.disconnect();
@@ -1001,17 +993,6 @@ const {
     "filters[is_active][$eq]": true,
   },
 });
-
-// INITIALIZE SCROLL ANIMATION AFTER CONTENT LOADS
-watch(
-  pending,
-  async (isPending) => {
-    if (isPending) return;
-
-    await initializeScrollReveal();
-  },
-  { immediate: true },
-);
 
 // SHARED PRODUCT STATE
 const products = useState<Product[]>("products", () => []);
@@ -1840,6 +1821,7 @@ function subscribeNewsletter() {
   color: #858b5c;
 }
 
+/* Anchor spacing for sticky navbar */
 #products,
 #categories {
   scroll-margin-top: 95px;
@@ -2796,7 +2778,7 @@ function subscribeNewsletter() {
 }
 
 /* ========================================
-   BASE ANIMATIONS
+   ANIMATIONS
 ======================================== */
 
 @keyframes mikeFadeUp {
@@ -2814,37 +2796,10 @@ function subscribeNewsletter() {
 .section-header,
 .product-search-area,
 .product-category-list,
-.product-grid {
+.product-grid,
+.promo-section,
+.newsletter-section {
   animation: mikeFadeUp 0.8s ease both;
-}
-
-/* ========================================
-   SCROLL REVEAL ANIMATIONS
-======================================== */
-
-.scroll-reveal {
-  opacity: 0;
-  transform: translateY(65px);
-  transition:
-    opacity 0.85s ease,
-    transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.scroll-reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* Hero and promotion zoom effect */
-.hero-section.scroll-reveal,
-.promo-section.scroll-reveal {
-  transform: translateY(45px) scale(0.98);
-}
-
-.hero-section.scroll-reveal.is-visible,
-.promo-section.scroll-reveal.is-visible {
-  transform: translateY(0) scale(1);
 }
 
 /* ========================================
@@ -3068,14 +3023,45 @@ function subscribeNewsletter() {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+/* =================================
+   SCROLL REVEAL ANIMATIONS
+================================= */
 
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(60px);
+  transition:
+    opacity 0.8s ease,
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+
+  will-change: opacity, transform;
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Optional: slight zoom effect for selected sections */
+.hero-section.scroll-reveal,
+.promotion-section.scroll-reveal {
+  transform: translateY(40px) scale(0.98);
+}
+
+.hero-section.scroll-reveal.is-visible,
+.promotion-section.scroll-reveal.is-visible {
+  transform: translateY(0) scale(1);
+}
+
+/* Respect reduced motion settings */
+@media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
   .hero-section.scroll-reveal,
-  .promo-section.scroll-reveal {
+  .promotion-section.scroll-reveal {
     opacity: 1;
     transform: none;
     transition: none;
-    will-change: auto;
   }
 }
 </style>
