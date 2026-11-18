@@ -452,6 +452,10 @@ async function getProducts() {
         "pagination[pageSize]": 100,
       },
     });
+
+    console.log("FULL PRODUCT RESPONSE:", response);
+    console.log("FIRST PRODUCT:", response.data?.[0]);
+    console.log("IMAGE DATA:", response.data?.[0]?.image);
     products.value = response.data || [];
   } catch (error) {
     console.error("Error fetching products:", error);

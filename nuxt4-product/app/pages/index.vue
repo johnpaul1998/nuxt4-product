@@ -1,4 +1,3 @@
-
 <template>
   <v-container fluid class="pa-0 nike-style">
     <!-- LOADING -->
@@ -16,13 +15,14 @@
 
     <div v-else>
       <!-- ANNOUNCEMENT -->
-      <div class="announcement-bar">
-        FREE SHIPPING ON SELECTED ORDERS
-      </div>
+      <div class="announcement-bar">FREE SHIPPING ON SELECTED ORDERS</div>
 
       <!-- NAVBAR -->
       <v-app-bar height="76" color="#F4F4F0" elevation="0" class="main-navbar">
-        <v-container fluid class="navbar-container d-flex align-center px-5 px-md-10">
+        <v-container
+          fluid
+          class="navbar-container d-flex align-center px-5 px-md-10"
+        >
           <NuxtLink to="/" class="brand-logo">JP.</NuxtLink>
 
           <v-spacer />
@@ -30,7 +30,9 @@
           <div class="desktop-navigation">
             <v-btn href="#top" variant="text" color="black">HOME</v-btn>
             <v-btn href="#products" variant="text" color="black">SHOP</v-btn>
-            <v-btn to="/products" variant="text" color="black">COLLECTIONS</v-btn>
+            <v-btn to="/products" variant="text" color="black"
+              >COLLECTIONS</v-btn
+            >
           </div>
 
           <v-spacer />
@@ -87,7 +89,10 @@
 
           <button
             class="mobile-cart-link"
-            @click="mobileMenu = false; cartDrawer = true"
+            @click="
+              mobileMenu = false;
+              cartDrawer = true;
+            "
           >
             <span>
               <v-icon class="mr-3">mdi-shopping-bag-outline</v-icon>
@@ -196,7 +201,9 @@
                       {{ formatPrice(item.price) }} / item
                     </div>
 
-                    <div class="d-flex align-center justify-space-between mt-3 flex-wrap ga-2">
+                    <div
+                      class="d-flex align-center justify-space-between mt-3 flex-wrap ga-2"
+                    >
                       <div class="quantity-control">
                         <v-btn
                           icon="mdi-minus"
@@ -240,16 +247,168 @@
               CLEAR BAG
             </v-btn>
 
-            <v-btn block color="black" size="large" disabled>
+            <v-btn block color="black" size="large" @click="openCheckout">
               CHECKOUT
+              <v-icon end>mdi-arrow-right</v-icon>
             </v-btn>
 
-            <p class="text-caption text-center mt-3">
-              Checkout coming soon.
-            </p>
+            <p class="text-caption text-center mt-3">Checkout coming soon.</p>
           </div>
         </div>
       </v-navigation-drawer>
+
+      <!-- CHECKOUT DIALOG -->
+      <v-dialog v-model="checkoutDialog" max-width="1050" scrollable>
+        <v-card rounded="lg" class="checkout-card">
+          <div class="checkout-header">
+            <div>
+              <span class="cart-header-eyebrow">J / P — CHECKOUT</span>
+              <h2>COMPLETE YOUR ORDER.</h2>
+            </div>
+            <v-btn
+              icon="mdi-close"
+              variant="text"
+              @click="checkoutDialog = false"
+              :disabled="isCheckingOut"
+            />
+          </div>
+
+          <v-divider />
+
+          <v-card-text class="pa-5 pa-md-8">
+            <v-row>
+              <!-- CUSTOMER INFORMATION -->
+              <v-col cols="12" md="6">
+                <h3 class="checkout-section-title mb-5">
+                  CUSTOMER INFORMATION
+                </h3>
+
+                <v-text-field
+                  v-model="customer.name"
+                  label="Full Name"
+                  variant="outlined"
+                  :disabled="isCheckingOut"
+                  :error-messages="checkoutErrors.name"
+                />
+
+                <v-text-field
+                  v-model="customer.email"
+                  label="Email Address"
+                  type="email"
+                  variant="outlined"
+                  :disabled="isCheckingOut"
+                  :error-messages="checkoutErrors.email"
+                />
+
+                <v-text-field
+                  v-model="customer.phone"
+                  label="Phone Number"
+                  variant="outlined"
+                  :disabled="isCheckingOut"
+                  :error-messages="checkoutErrors.phone"
+                />
+
+                <v-textarea
+                  v-model="customer.address"
+                  label="Complete Shipping Address"
+                  variant="outlined"
+                  rows="3"
+                  :disabled="isCheckingOut"
+                  :error-messages="checkoutErrors.address"
+                />
+
+                <h3 class="checkout-section-title mb-4 mt-3">PAYMENT METHOD</h3>
+
+                <v-radio-group
+                  v-model="customer.paymentMethod"
+                  :disabled="isCheckingOut"
+                  :error-messages="checkoutErrors.paymentMethod"
+                >
+                  <v-radio label="Cash on Delivery (COD)" value="COD" />
+                  <v-radio label="GCash" value="GCash" />
+                </v-radio-group>
+              </v-col>
+
+              <!-- ORDER SUMMARY -->
+              <v-col cols="12" md="6">
+                <h3 class="checkout-section-title mb-5">ORDER SUMMARY</h3>
+
+                <div
+                  v-for="item in cart"
+                  :key="item.documentId"
+                  class="checkout-item"
+                >
+                  <div class="checkout-item-image">
+                    <v-img
+                      v-if="getImageUrl(item.image)"
+                      :src="getImageUrl(item.image)"
+                      width="65"
+                      height="65"
+                      cover
+                    />
+                    <v-icon v-else size="30">mdi-image-outline</v-icon>
+                  </div>
+
+                  <div class="flex-grow-1">
+                    <div class="font-weight-bold">{{ item.name }}</div>
+                    <div class="text-caption text-grey">
+                      {{ formatPrice(item.price) }} × {{ item.quantity }}
+                    </div>
+                  </div>
+
+                  <strong>
+                    {{ formatPrice(item.price * item.quantity) }}
+                  </strong>
+                </div>
+
+                <v-divider class="my-5" />
+
+                <div class="d-flex justify-space-between mb-3">
+                  <span>Total Items</span>
+                  <strong>{{ cartItemCount }}</strong>
+                </div>
+
+                <div class="d-flex justify-space-between mb-3">
+                  <span>Subtotal</span>
+                  <strong>{{ formatPrice(cartTotal) }}</strong>
+                </div>
+
+                <div class="d-flex justify-space-between text-h6 mt-5">
+                  <strong>TOTAL</strong>
+                  <strong>{{ formatPrice(cartTotal) }}</strong>
+                </div>
+
+                <v-alert
+                  v-if="checkoutError"
+                  type="error"
+                  variant="tonal"
+                  class="mt-5"
+                >
+                  {{ checkoutError }}
+                </v-alert>
+
+                <v-btn
+                  block
+                  color="black"
+                  size="x-large"
+                  rounded="pill"
+                  class="mt-6"
+                  :loading="isCheckingOut"
+                  :disabled="cart.length === 0"
+                  @click="submitCheckout"
+                >
+                  PLACE ORDER
+                  <v-icon end>mdi-arrow-right</v-icon>
+                </v-btn>
+
+                <p class="text-caption text-grey text-center mt-3">
+                  Please review your information before placing your order.
+                </p>
+              </v-col>
+            </v-row>
+          </v-card-text>
+        </v-card>
+      </v-dialog>
 
       <!-- HERO -->
       <section id="top" class="hero-section">
@@ -271,8 +430,8 @@
                 <h1>MOVE<br />YOUR<br />WAY.</h1>
 
                 <p>
-                  Everyday essentials. Timeless style.
-                  Discover your next favorite find.
+                  Everyday essentials. Timeless style. Discover your next
+                  favorite find.
                 </p>
 
                 <v-btn
@@ -300,10 +459,7 @@
 
                 <h1>OWN<br />YOUR<br />LOOK.</h1>
 
-                <p>
-                  Simple pieces. Strong identity.
-                  Make every day your own.
-                </p>
+                <p>Simple pieces. Strong identity. Make every day your own.</p>
 
                 <v-btn
                   href="#products"
@@ -331,8 +487,7 @@
                 <h1>LIVE<br />IN<br />STYLE.</h1>
 
                 <p>
-                  Discover fresh finds designed to fit
-                  your everyday lifestyle.
+                  Discover fresh finds designed to fit your everyday lifestyle.
                 </p>
 
                 <v-btn
@@ -372,8 +527,8 @@
             <h2>LESS ORDINARY.<br />MORE YOU.</h2>
 
             <p>
-              Discover products that bring style and simplicity
-              into your everyday life.
+              Discover products that bring style and simplicity into your
+              everyday life.
             </p>
 
             <v-btn to="/products" color="white" rounded="pill" size="large">
@@ -510,7 +665,9 @@
                   @click.stop="toggleWishlist(product)"
                 >
                   <v-icon :color="isWishlisted(product) ? 'red' : 'black'">
-                    {{ isWishlisted(product) ? "mdi-heart" : "mdi-heart-outline" }}
+                    {{
+                      isWishlisted(product) ? "mdi-heart" : "mdi-heart-outline"
+                    }}
                   </v-icon>
                 </v-btn>
 
@@ -519,9 +676,7 @@
                   AVAILABLE
                 </div>
 
-                <div v-else class="product-tag out-of-stock">
-                  SOLD OUT
-                </div>
+                <div v-else class="product-tag out-of-stock">SOLD OUT</div>
               </div>
 
               <!-- PRODUCT DETAILS -->
@@ -539,7 +694,9 @@
                 </div>
 
                 <p class="product-description">
-                  {{ product.description || "A fresh find for everyday living." }}
+                  {{
+                    product.description || "A fresh find for everyday living."
+                  }}
                 </p>
               </v-card-text>
 
@@ -572,9 +729,7 @@
 
               <h2>NEVER MISS<br />A THING.</h2>
 
-              <p>
-                Get the latest updates, new arrivals, and exclusive offers.
-              </p>
+              <p>Get the latest updates, new arrivals, and exclusive offers.</p>
             </v-col>
 
             <v-col cols="12" md="6">
@@ -833,6 +988,253 @@ function clearCart() {
   cart.value = [];
 }
 
+// CHECKOUT STATE
+const checkoutDialog = ref(false);
+const isCheckingOut = ref(false);
+const checkoutError = ref("");
+
+const customer = reactive({
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  paymentMethod: "COD",
+});
+
+const checkoutErrors = reactive({
+  name: "",
+  email: "",
+  phone: "",
+  address: "",
+  paymentMethod: "",
+});
+
+// OPEN CHECKOUT
+function openCheckout() {
+  if (cart.value.length === 0) {
+    cartMessage.value = "Your bag is empty.";
+    showCartMessage.value = true;
+    return;
+  }
+
+  checkoutError.value = "";
+  Object.keys(checkoutErrors).forEach((key) => {
+    checkoutErrors[key as keyof typeof checkoutErrors] = "";
+  });
+
+  cartDrawer.value = false;
+  checkoutDialog.value = true;
+}
+
+// CUSTOMER VALIDATION
+function validateCheckout(): boolean {
+  Object.keys(checkoutErrors).forEach((key) => {
+    checkoutErrors[key as keyof typeof checkoutErrors] = "";
+  });
+
+  let valid = true;
+
+  if (!customer.name.trim()) {
+    checkoutErrors.name = "Full name is required.";
+    valid = false;
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer.email)) {
+    checkoutErrors.email = "Enter a valid email address.";
+    valid = false;
+  }
+
+  if (!customer.phone.trim() || customer.phone.trim().length < 7) {
+    checkoutErrors.phone = "Enter a valid phone number.";
+    valid = false;
+  }
+
+  if (!customer.address.trim()) {
+    checkoutErrors.address = "Shipping address is required.";
+    valid = false;
+  }
+
+  if (!["COD", "GCash"].includes(customer.paymentMethod)) {
+    checkoutErrors.paymentMethod = "Select a payment method.";
+    valid = false;
+  }
+
+  return valid;
+}
+
+// STRAPI REQUEST HELPER
+async function strapiRequest(endpoint: string, method = "GET", body?: unknown) {
+  const response = await fetch(`${STRAPI_URL}${endpoint}`, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(
+      result?.error?.message ||
+        result?.message ||
+        `Strapi request failed: ${response.status}`,
+    );
+  }
+
+  return result;
+}
+
+// SUBMIT CHECKOUT
+async function submitCheckout() {
+  checkoutError.value = "";
+
+  if (!validateCheckout()) return;
+
+  if (cart.value.length === 0) {
+    checkoutError.value = "Your cart is empty.";
+    return;
+  }
+
+  isCheckingOut.value = true;
+
+  try {
+    // STEP 1: RECHECK CURRENT PRODUCT DATA FROM STRAPI
+    const verifiedItems = [];
+
+    for (const item of cart.value) {
+      const result = await strapiRequest(
+        `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
+      );
+
+      const product = result.data;
+
+      if (!product || !product.is_active) {
+        throw new Error(`${item.name} is no longer available.`);
+      }
+
+      if (Number(product.stock) < item.quantity) {
+        throw new Error(
+          `Insufficient stock for ${product.name}. Available: ${product.stock}`,
+        );
+      }
+
+      verifiedItems.push({
+        documentId: product.documentId,
+        name: product.name,
+        price: Number(product.price),
+        stock: Number(product.stock),
+        quantity: item.quantity,
+      });
+    }
+
+    // STEP 2: COMPUTE TOTAL USING STRAPI PRICES
+    const totalItems = verifiedItems.reduce(
+      (total, item) => total + item.quantity,
+      0,
+    );
+
+    const totalAmount = Number(
+      verifiedItems
+        .reduce((total, item) => total + item.price * item.quantity, 0)
+        .toFixed(2),
+    );
+
+    // STEP 3: CREATE ORDER
+    const orderResult = await strapiRequest("/api/orders", "POST", {
+      data: {
+        customerName: customer.name.trim(),
+        email: customer.email.trim(),
+        phone: customer.phone.trim(),
+        shippingAddress: customer.address.trim(),
+        paymentMethod: customer.paymentMethod,
+        order_status: "Pending",
+        totalAmount,
+        totalItems,
+      },
+    });
+
+    const orderId = orderResult.data?.documentId;
+
+    if (!orderId) {
+      throw new Error("Order was created without a document ID.");
+    }
+
+    // STEP 4: CREATE ORDER ITEMS
+    for (const item of verifiedItems) {
+      await strapiRequest("/api/order-items", "POST", {
+        data: {
+          quantity: item.quantity,
+          unitPrice: item.price,
+          subtotal: Number((item.price * item.quantity).toFixed(2)),
+          product: {
+            connect: [item.documentId],
+          },
+          order: {
+            connect: [orderId],
+          },
+        },
+      });
+    }
+
+    // STEP 5: DEDUCT PRODUCT STOCK
+    for (const item of verifiedItems) {
+      const before = await strapiRequest(
+        `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
+      );
+
+      console.log("IMAGE BEFORE STOCK UPDATE:", before.data?.image);
+
+      const remainingStock = item.stock - item.quantity;
+
+      const updateResult = await strapiRequest(
+        `/api/products/${encodeURIComponent(item.documentId)}`,
+        "PUT",
+        { data: { stock: remainingStock } },
+      );
+
+      console.log("STOCK UPDATE RESPONSE:", updateResult);
+
+      const after = await strapiRequest(
+        `/api/products/${encodeURIComponent(item.documentId)}?populate=image`,
+      );
+
+      console.log("IMAGE AFTER STOCK UPDATE:", after.data?.image);
+    }
+
+    // STEP 6: SUCCESS
+
+    console.log(
+      "PRODUCT LISTING AFTER CHECKOUT:",
+      products.value.map((product) => ({
+        name: product.name,
+        image: product.image,
+        imageUrl: getImageUrl(product.image),
+      })),
+    );
+    cart.value = [];
+
+    customer.name = "";
+    customer.email = "";
+    customer.phone = "";
+    customer.address = "";
+    customer.paymentMethod = "COD";
+
+    checkoutDialog.value = false;
+
+    cartMessage.value = `Order ${orderId} placed successfully!`;
+
+    showCartMessage.value = true;
+  } catch (error: any) {
+    console.error("CHECKOUT ERROR:", error);
+
+    checkoutError.value =
+      error?.message || "Something went wrong during checkout.";
+  } finally {
+    isCheckingOut.value = false;
+  }
+}
+
 // IMAGE URL
 function getImageUrl(image: any): string {
   const imageData = Array.isArray(image) ? image[0] : image;
@@ -844,10 +1246,7 @@ function getImageUrl(image: any): string {
     imageData.formats?.small?.url ||
     imageData.url;
 
-  if (
-    imageUrl.startsWith("http://") ||
-    imageUrl.startsWith("https://")
-  ) {
+  if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
     return imageUrl;
   }
 
@@ -1453,6 +1852,51 @@ function subscribeNewsletter() {
   color: #777 !important;
   border-color: #d5d5d5 !important;
   opacity: 1 !important;
+}
+
+/* CHECKOUT */
+.checkout-card {
+  background: #f9f9f6;
+}
+
+.checkout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+}
+
+.checkout-header h2 {
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 1000;
+  letter-spacing: -1px;
+  margin-top: 5px;
+}
+
+.checkout-section-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.checkout-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e5e5df;
+}
+
+.checkout-item-image {
+  width: 65px;
+  height: 65px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #edede8;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 /* CART DRAWER */
