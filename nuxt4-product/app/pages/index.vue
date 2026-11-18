@@ -929,36 +929,6 @@ const heroSlides = [
   },
 ];
 
-import { onMounted, onBeforeUnmount } from "vue";
-
-let revealObserver: IntersectionObserver | null = null;
-
-onMounted(() => {
-  revealObserver = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
-        } else {
-          entry.target.classList.remove("is-visible");
-        }
-      });
-    },
-    {
-      threshold: 0.15,
-      rootMargin: "0px 0px -50px 0px",
-    },
-  );
-
-  document.querySelectorAll(".scroll-reveal").forEach((element) => {
-    revealObserver?.observe(element);
-  });
-});
-
-onBeforeUnmount(() => {
-  revealObserver?.disconnect();
-});
-
 // SEARCH AND CATEGORY
 const searchQuery = ref("");
 const selectedCategory = ref("All");
@@ -1017,6 +987,78 @@ const {
     "pagination[pageSize]": 100,
     "filters[is_active][$eq]": true,
   },
+});
+
+// ========================================
+// SCROLL REVEAL
+// ========================================
+
+let revealObserver: IntersectionObserver | null = null;
+
+function initializeScrollReveal() {
+  if (typeof window === "undefined") return;
+
+  // Respect users who prefer reduced motion
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    document.querySelectorAll(".scroll-reveal").forEach((element) => {
+      element.classList.add("is-visible");
+    });
+    return;
+  }
+
+  if (!revealObserver) {
+    revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("is-visible");
+
+            // Animate only once. No flickering when scrolling back.
+            revealObserver?.unobserve(entry.target);
+          }
+        });
+      },
+      {
+        threshold: 0.08,
+        rootMargin: "0px 0px -60px 0px",
+      },
+    );
+  }
+
+  document
+    .querySelectorAll(".scroll-reveal:not(.is-visible)")
+    .forEach((element) => {
+      revealObserver?.observe(element);
+    });
+}
+
+// IMPORTANT:
+// Your page uses v-if="pending", so the sections are not
+// available when onMounted initially runs.
+// Wait until loading finishes before observing them.
+
+watch(
+  pending,
+  async (isPending) => {
+    if (!isPending) {
+      await nextTick();
+      initializeScrollReveal();
+    }
+  },
+  { immediate: true, flush: "post" },
+);
+
+onMounted(async () => {
+  await nextTick();
+
+  if (!pending.value) {
+    initializeScrollReveal();
+  }
+});
+
+onBeforeUnmount(() => {
+  revealObserver?.disconnect();
+  revealObserver = null;
 });
 
 // SHARED PRODUCT STATE
@@ -3038,44 +3080,91 @@ function subscribeNewsletter() {
     scroll-behavior: auto !important;
   }
 }
-/* =================================
+
+/* ========================================
    SCROLL REVEAL ANIMATIONS
-================================= */
+======================================== */
 
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(60px);
+  transform: translate3d(0, 55px, 0);
   transition:
-    opacity 0.8s ease,
-    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 0.9s ease,
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
 
   will-change: opacity, transform;
 }
 
 .scroll-reveal.is-visible {
   opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* HERO */
+.hero-section.scroll-reveal {
+  transform: translate3d(0, 35px, 0) scale(0.985);
+}
+
+.hero-section.scroll-reveal.is-visible {
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+/* PROMOTION */
+.promo-content.scroll-reveal {
+  transform: translate3d(-45px, 0, 0);
+}
+
+.promo-content.scroll-reveal.is-visible {
+  transform: translate3d(0, 0, 0);
+}
+
+/* PRODUCT CARDS */
+.product-column {
+  animation: none;
+}
+
+.product-grid .product-column {
+  opacity: 0;
+  transform: translateY(35px);
+  transition:
+    opacity 0.7s ease,
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.scroll-reveal.is-visible .product-column {
+  opacity: 1;
   transform: translateY(0);
 }
 
-/* Optional: slight zoom effect for selected sections */
-.hero-section.scroll-reveal,
-.promotion-section.scroll-reveal {
-  transform: translateY(40px) scale(0.98);
+.scroll-reveal.is-visible .product-column:nth-child(1) {
+  transition-delay: 0.05s;
 }
 
-.hero-section.scroll-reveal.is-visible,
-.promotion-section.scroll-reveal.is-visible {
-  transform: translateY(0) scale(1);
+.scroll-reveal.is-visible .product-column:nth-child(2) {
+  transition-delay: 0.12s;
 }
 
-/* Respect reduced motion settings */
+.scroll-reveal.is-visible .product-column:nth-child(3) {
+  transition-delay: 0.19s;
+}
+
+.scroll-reveal.is-visible .product-column:nth-child(4) {
+  transition-delay: 0.26s;
+}
+
+.scroll-reveal.is-visible .product-column:nth-child(n + 5) {
+  transition-delay: 0.3s;
+}
+
+/* ACCESSIBILITY */
 @media (prefers-reduced-motion: reduce) {
   .scroll-reveal,
   .hero-section.scroll-reveal,
-  .promotion-section.scroll-reveal {
-    opacity: 1;
-    transform: none;
-    transition: none;
+  .promo-content.scroll-reveal,
+  .product-grid .product-column {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
 </style>
