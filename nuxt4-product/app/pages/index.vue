@@ -1049,7 +1049,7 @@ function addToCart(product: Product) {
     });
   }
 
-  cartMessage.value = `${product.name} added to your bag!`;
+  cartMessage.value = `${product.name} added to your cart!`;
   showCartMessage.value = true;
 }
 
