@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   devtools: { enabled: true },
   runtimeConfig: {
     public: {
-      strapiUrl: 'http://localhost:1340',
+      strapiUrl: 'https://product-cms-jecw.onrender.com',
       },
     },
      modules: [
