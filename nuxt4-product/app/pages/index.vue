@@ -601,15 +601,10 @@
             <p>Find your next everyday favorite.</p>
           </div>
 
-          <v-btn
-            to="/products"
-            variant="text"
-            color="black"
-            class="font-weight-bold"
-          >
+          <NuxtLink to="/viewAllProducts" class="view-all-link">
             VIEW ALL
             <v-icon end>mdi-arrow-right</v-icon>
-          </v-btn>
+          </NuxtLink>
         </div>
 
         <!-- SEARCH -->
@@ -1920,8 +1915,6 @@ function subscribeNewsletter() {
   opacity: 1 !important;
 }
 
-
-
 /* ORDER SUCCESS */
 .success-card {
   background: #f9f9f6;
@@ -1980,7 +1973,6 @@ function subscribeNewsletter() {
   color: #111;
   word-break: break-all;
 }
-
 
 /* CHECKOUT */
 .checkout-card {
