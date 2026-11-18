@@ -44,7 +44,7 @@
               color="black"
             >
               <v-btn icon variant="text" @click="cartDrawer = true">
-                <v-icon size="25">mdi-shopping-bag-outline</v-icon>
+                CART
               </v-btn>
             </v-badge>
           </div>
@@ -2463,6 +2463,8 @@ function subscribeNewsletter() {
   font-size: 22px;
   font-weight: 900;
 }
+
+
 
 /* ========================================
    CHECKOUT
