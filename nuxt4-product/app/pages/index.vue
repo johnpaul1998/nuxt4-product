@@ -1,4 +1,3 @@
-
 <template>
   <v-container fluid class="pa-0 nike-style">
     <!-- LOADING -->
@@ -16,23 +15,24 @@
 
     <div v-else>
       <!-- ANNOUNCEMENT -->
-      <div class="announcement-bar">
-        FREE SHIPPING ON SELECTED ORDERS
-      </div>
+      <div class="announcement-bar">FREE SHIPPING ON SELECTED ORDERS</div>
 
       <!-- NAVBAR -->
       <v-app-bar height="76" color="#F4F4F0" elevation="0" class="main-navbar">
-        <v-container fluid class="navbar-container d-flex align-center px-5 px-md-10">
-          <NuxtLink to="/" class="brand-logo">
-            Mikē<span>.</span>
-          </NuxtLink>
+        <v-container
+          fluid
+          class="navbar-container d-flex align-center px-5 px-md-10"
+        >
+          <NuxtLink to="/" class="brand-logo"> Mikē<span>.</span> </NuxtLink>
 
           <v-spacer />
 
           <div class="desktop-navigation">
             <v-btn href="#top" variant="text" color="black">HOME</v-btn>
             <v-btn href="#products" variant="text" color="black">SHOP</v-btn>
-            <v-btn to="/products" variant="text" color="black">COLLECTIONS</v-btn>
+            <v-btn to="/products" variant="text" color="black"
+              >COLLECTIONS</v-btn
+            >
           </div>
 
           <v-spacer />
@@ -89,7 +89,10 @@
 
           <button
             class="mobile-cart-link"
-            @click="mobileMenu = false; cartDrawer = true"
+            @click="
+              mobileMenu = false;
+              cartDrawer = true;
+            "
           >
             <span>
               <v-icon class="mr-3">mdi-shopping-bag-outline</v-icon>
@@ -121,7 +124,9 @@
         <div class="cart-header">
           <div>
             <span class="cart-eyebrow">Mikē — YOUR SELECTION</span>
-            <h2>YOUR CART <span>({{ cartItemCount }})</span></h2>
+            <h2>
+              YOUR CART <span>({{ cartItemCount }})</span>
+            </h2>
           </div>
 
           <v-btn icon="mdi-close" variant="text" @click="cartDrawer = false" />
@@ -530,40 +535,42 @@
       </section>
 
       <!-- CATEGORIES -->
-      <v-container id="categories" class="section-spacing ">
-        <div class="section-header ">
-          <div>
-            <span class="eyebrow">EXPLORE THE COLLECTION</span>
-            <h2>SHOP BY CATEGORY.</h2>
-            <p>Find the perfect essentials for your everyday life.</p>
-          </div>
-        </div>
-
-        <div class="category-showcase">
-          <button
-            v-for="(category, index) in categories"
-            :key="category"
-            class="category-showcase-card"
-            @click="selectCategory(category)"
-          >
-            <span class="category-number">
-              {{ String(index + 1).padStart(2, "0") }}
-            </span>
-
-            <div class="category-card-content">
-              <h3>{{ category }}</h3>
-              <span>EXPLORE COLLECTION</span>
+      <section class="scroll-reveal">
+        <v-container id="categories" class="section-spacing">
+          <div class="section-header">
+            <div>
+              <span class="eyebrow">EXPLORE THE COLLECTION</span>
+              <h2>SHOP BY CATEGORY.</h2>
+              <p>Find the perfect essentials for your everyday life.</p>
             </div>
+          </div>
 
-            <v-icon class="category-arrow">mdi-arrow-up-right</v-icon>
-          </button>
-        </div>
-      </v-container>
+          <div class="category-showcase">
+            <button
+              v-for="(category, index) in categories"
+              :key="category"
+              class="category-showcase-card"
+              @click="selectCategory(category)"
+            >
+              <span class="category-number">
+                {{ String(index + 1).padStart(2, "0") }}
+              </span>
+
+              <div class="category-card-content">
+                <h3>{{ category }}</h3>
+                <span>EXPLORE COLLECTION</span>
+              </div>
+
+              <v-icon class="category-arrow">mdi-arrow-up-right</v-icon>
+            </button>
+          </div>
+        </v-container>
+      </section>
 
       <!-- PROMOTION -->
       <v-container class="section-spacing">
-        <section class="promo-section scroll-reveal">
-          <div class="promo-content ">
+        <section class="promo-section">
+          <div class="promo-content scroll-reveal">
             <span class="eyebrow light-eyebrow">THE Mikē EXPERIENCE</span>
 
             <h2>LESS ORDINARY.<br />MORE YOU.</h2>
@@ -632,125 +639,138 @@
           <span class="search-caption">FIND SOMETHING YOU LOVE.</span>
         </div>
 
-        <!-- FILTER -->
-        <div class="category-list product-category-list">
-          <v-chip
-            :color="selectedCategory === 'All' ? 'black' : undefined"
-            :variant="selectedCategory === 'All' ? 'flat' : 'outlined'"
-            size="large"
-            @click="selectedCategory = 'All'"
+        <section class="scroll-reveal">
+          <!-- FILTER -->
+          <div class="category-list product-category-list">
+            <v-chip
+              :color="selectedCategory === 'All' ? 'black' : undefined"
+              :variant="selectedCategory === 'All' ? 'flat' : 'outlined'"
+              size="large"
+              @click="selectedCategory = 'All'"
+            >
+              ALL
+            </v-chip>
+
+            <v-chip
+              v-for="category in categories"
+              :key="category"
+              :color="selectedCategory === category ? 'black' : undefined"
+              :variant="selectedCategory === category ? 'flat' : 'outlined'"
+              size="large"
+              @click="selectedCategory = category"
+            >
+              {{ category.toUpperCase() }}
+            </v-chip>
+          </div>
+
+          <v-alert v-if="error" type="warning" variant="tonal" class="mt-6">
+            Unable to load products. Please check your Strapi connection.
+          </v-alert>
+
+          <v-alert
+            v-else-if="filteredProducts.length === 0"
+            type="info"
+            variant="tonal"
+            class="mt-6"
           >
-            ALL
-          </v-chip>
+            No products found. Try another search.
+          </v-alert>
 
-          <v-chip
-            v-for="category in categories"
-            :key="category"
-            :color="selectedCategory === category ? 'black' : undefined"
-            :variant="selectedCategory === category ? 'flat' : 'outlined'"
-            size="large"
-            @click="selectedCategory = category"
-          >
-            {{ category.toUpperCase() }}
-          </v-chip>
-        </div>
+          <!-- PRODUCT GRID -->
+          <v-row v-else class="product-grid mt-4">
+            <v-col
+              v-for="product in filteredProducts"
+              :key="product.documentId"
+              cols="12"
+              sm="6"
+              md="4"
+              lg="3"
+              class="product-column"
+            >
+              <v-card
+                class="product-card"
+                rounded="0"
+                elevation="0"
+                height="100%"
+              >
+                <div class="product-image">
+                  <v-img
+                    v-if="getImageUrl(product.image)"
+                    :src="getImageUrl(product.image)"
+                    height="300"
+                    cover
+                  />
 
-        <v-alert v-if="error" type="warning" variant="tonal" class="mt-6">
-          Unable to load products. Please check your Strapi connection.
-        </v-alert>
+                  <div v-else class="image-placeholder">
+                    <v-icon size="60">mdi-image-outline</v-icon>
+                  </div>
 
-        <v-alert
-          v-else-if="filteredProducts.length === 0"
-          type="info"
-          variant="tonal"
-          class="mt-6"
-        >
-          No products found. Try another search.
-        </v-alert>
+                  <v-btn
+                    icon
+                    size="small"
+                    color="white"
+                    class="wishlist-button"
+                    @click.stop="toggleWishlist(product)"
+                  >
+                    <v-icon :color="isWishlisted(product) ? 'red' : 'black'">
+                      {{
+                        isWishlisted(product)
+                          ? "mdi-heart"
+                          : "mdi-heart-outline"
+                      }}
+                    </v-icon>
+                  </v-btn>
 
-        <!-- PRODUCT GRID -->
-        <v-row v-else class="product-grid mt-4">
-          <v-col
-            v-for="product in filteredProducts"
-            :key="product.documentId"
-            cols="12"
-            sm="6"
-            md="4"
-            lg="3"
-            class="product-column"
-          >
-            <v-card class="product-card" rounded="0" elevation="0" height="100%">
-              <div class="product-image">
-                <v-img
-                  v-if="getImageUrl(product.image)"
-                  :src="getImageUrl(product.image)"
-                  height="300"
-                  cover
-                />
-
-                <div v-else class="image-placeholder">
-                  <v-icon size="60">mdi-image-outline</v-icon>
+                  <div
+                    class="product-tag"
+                    :class="{ 'out-of-stock': product.stock <= 0 }"
+                  >
+                    {{ product.stock > 0 ? "AVAILABLE" : "SOLD OUT" }}
+                  </div>
                 </div>
 
-                <v-btn
-                  icon
-                  size="small"
-                  color="white"
-                  class="wishlist-button"
-                  @click.stop="toggleWishlist(product)"
-                >
-                  <v-icon :color="isWishlisted(product) ? 'red' : 'black'">
-                    {{ isWishlisted(product) ? "mdi-heart" : "mdi-heart-outline" }}
-                  </v-icon>
-                </v-btn>
+                <v-card-text class="product-details">
+                  <div class="product-heading">
+                    <h3 class="product-name">{{ product.name }}</h3>
+                    <p class="product-category">
+                      {{ product.category || "EVERYDAY COLLECTION" }}
+                    </p>
+                  </div>
 
-                <div
-                  class="product-tag"
-                  :class="{ 'out-of-stock': product.stock <= 0 }"
-                >
-                  {{ product.stock > 0 ? "AVAILABLE" : "SOLD OUT" }}
-                </div>
-              </div>
+                  <div class="product-price">
+                    {{ formatPrice(product.price) }}
+                  </div>
 
-              <v-card-text class="product-details">
-                <div class="product-heading">
-                  <h3 class="product-name">{{ product.name }}</h3>
-                  <p class="product-category">
-                    {{ product.category || "EVERYDAY COLLECTION" }}
+                  <p class="product-description">
+                    {{
+                      product.description || "A fresh find for everyday living."
+                    }}
                   </p>
-                </div>
+                </v-card-text>
 
-                <div class="product-price">
-                  {{ formatPrice(product.price) }}
-                </div>
-
-                <p class="product-description">
-                  {{ product.description || "A fresh find for everyday living." }}
-                </p>
-              </v-card-text>
-
-              <v-card-actions class="product-actions">
-                <v-btn
-                  class="add-to-cart-button"
-                  color="black"
-                  block
-                  rounded="pill"
-                  height="48"
-                  :disabled="product.stock <= 0"
-                  @click="addToCart(product)"
-                >
-                  ADD TO CART
-                  <v-icon end>mdi-plus</v-icon>
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-col>
-        </v-row>
+                <v-card-actions class="product-actions">
+                  <v-btn
+                    class="add-to-cart-button"
+                    color="black"
+                    block
+                    rounded="pill"
+                    height="48"
+                    :disabled="product.stock <= 0"
+                    @click="addToCart(product)"
+                  >
+                    ADD TO CART
+                    <v-icon end>mdi-plus</v-icon>
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-col>
+          </v-row>
+        </section>
       </v-container>
 
       <!-- NEWSLETTER -->
-      <section class="newsletter-section scroll-reveal">
-        <v-container class="py-12">
+      <section class="newsletter-section">
+        <v-container class="py-12 scroll-reveal">
           <v-row align="center">
             <v-col cols="12" md="6">
               <span class="eyebrow">STAY IN THE GAME</span>
@@ -759,7 +779,10 @@
             </v-col>
 
             <v-col cols="12" md="6">
-              <v-form class="newsletter-form" @submit.prevent="subscribeNewsletter">
+              <v-form
+                class="newsletter-form"
+                @submit.prevent="subscribeNewsletter"
+              >
                 <v-text-field
                   v-model="newsletterEmail"
                   label="Your email address"
@@ -789,7 +812,7 @@
       </section>
 
       <!-- FOOTER -->
-      <v-footer class="main-footer scroll-reveal">
+      <v-footer class="main-footer">
         <v-container class="py-10">
           <v-row>
             <v-col cols="12" md="6">
@@ -880,7 +903,8 @@ const heroSlides = [
     class: "slide-one",
     eyebrow: "THE NEW COLLECTION",
     heading: "MOVE<br>YOUR<br>WAY.",
-    description: "Everyday essentials. Timeless style. Discover your next favorite find.",
+    description:
+      "Everyday essentials. Timeless style. Discover your next favorite find.",
     button: "SHOP NOW",
     label: "EVERYDAY COLLECTION",
   },
@@ -898,7 +922,8 @@ const heroSlides = [
     class: "slide-three",
     eyebrow: "MADE FOR EVERYDAY",
     heading: "LIVE<br>IN<br>STYLE.",
-    description: "Discover fresh finds designed to fit your everyday lifestyle.",
+    description:
+      "Discover fresh finds designed to fit your everyday lifestyle.",
     button: "DISCOVER MORE",
     label: "LIFESTYLE COLLECTION",
   },
@@ -922,7 +947,7 @@ onMounted(() => {
     {
       threshold: 0.15,
       rootMargin: "0px 0px -50px 0px",
-    }
+    },
   );
 
   document.querySelectorAll(".scroll-reveal").forEach((element) => {
@@ -1027,9 +1052,7 @@ function updateProductState(updatedProduct: Product) {
 
 // CATEGORIES
 const categories = computed(() => [
-  ...new Set(
-    products.value.map((product) => product.category).filter(Boolean),
-  ),
+  ...new Set(products.value.map((product) => product.category).filter(Boolean)),
 ]);
 
 // CATEGORY CLICK
@@ -1073,10 +1096,7 @@ const cartItemCount = computed(() =>
 
 // CART TOTAL
 const cartTotal = computed(() =>
-  cart.value.reduce(
-    (total, item) => total + item.price * item.quantity,
-    0,
-  ),
+  cart.value.reduce((total, item) => total + item.price * item.quantity, 0),
 );
 
 // ADD TO CART
@@ -1129,9 +1149,7 @@ function decreaseQuantity(documentId: string) {
 
 // REMOVE FROM CART
 function removeFromCart(documentId: string) {
-  cart.value = cart.value.filter(
-    (item) => item.documentId !== documentId,
-  );
+  cart.value = cart.value.filter((item) => item.documentId !== documentId);
 }
 
 // CHECKOUT
@@ -1213,11 +1231,7 @@ function validateCheckout(): boolean {
 }
 
 // STRAPI REQUEST
-async function strapiRequest(
-  endpoint: string,
-  method = "GET",
-  body?: unknown,
-) {
+async function strapiRequest(endpoint: string, method = "GET", body?: unknown) {
   const response = await fetch(`${STRAPI_URL}${endpoint}`, {
     method,
     headers: {
