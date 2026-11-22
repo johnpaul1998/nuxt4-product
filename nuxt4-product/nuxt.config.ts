@@ -8,6 +8,7 @@ export default defineNuxtConfig({
       },
     },
      modules: [
-    'vuetify-nuxt-module'
+    'vuetify-nuxt-module',
+    '@vercel/analytics'
   ]
 })
