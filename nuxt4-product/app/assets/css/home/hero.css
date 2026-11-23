@@ -1,0 +1,110 @@
+/* ========================================
+   HERO
+======================================== */
+
+.hero-section {
+  width: 100%;
+  overflow: hidden;
+  background: var(--mike-dark);
+}
+
+.hero-slide {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  min-height: 540px;
+  padding: 60px 10%;
+  background-position: center;
+  background-size: cover;
+}
+
+.slide-one {
+  background-image: url("https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=1800&q=85");
+  background-position: center 35%;
+}
+
+.slide-two {
+  background-image: url("https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1800&q=85");
+}
+
+.slide-three {
+  background-image: url("https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1800&q=85");
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.82),
+    rgba(0, 0, 0, 0.42),
+    rgba(0, 0, 0, 0.08)
+  );
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 650px;
+  color: white;
+  animation: mikeFadeUp 0.9s ease both;
+}
+
+.hero-accent-line {
+  width: 48px;
+  height: 4px;
+  margin-bottom: 22px;
+  border-radius: 10px;
+  background: var(--mike-accent);
+}
+
+.hero-eyebrow {
+  color: var(--mike-accent);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 3px;
+}
+
+.hero-content h1 {
+  margin-top: 25px;
+  color: white;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(75px, 11vw, 140px);
+  font-weight: 900;
+  line-height: 0.83;
+  letter-spacing: -7px;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.hero-content p {
+  max-width: 390px;
+  margin-top: 25px;
+  margin-bottom: 25px;
+  color: #deded8;
+  font-size: 14px;
+  line-height: 1.9;
+}
+
+.hero-button {
+  color: #111 !important;
+  font-weight: 900 !important;
+  letter-spacing: 1px;
+  transition: all 0.3s ease !important;
+}
+
+.promo-button:hover .hero-button:hover{
+  background: var(--mike-accent) !important;
+  transform: translateY(-4px);
+}
+
+.hero-bottom-label {
+  position: absolute;
+  right: 30px;
+  bottom: 22px;
+  z-index: 2;
+  color: var(--mike-accent);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}

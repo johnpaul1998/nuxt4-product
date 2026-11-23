@@ -1,0 +1,12 @@
+@import "./home/base.css";
+@import "./home/navbar.css";
+@import "./home/hero.css";
+@import "./home/animations.css";
+@import "./home/responsive.css";
+@import "./home/footer.css";
+@import "./home/newsletter.css";
+@import "./home/products.css";
+@import "./home/searchAndFilter.css";
+@import "./home/promotion.css";
+@import "./home/sections.css";
+@import "./home/checkout.css";

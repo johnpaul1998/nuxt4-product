@@ -1,0 +1,70 @@
+/* ========================================
+   PROMOTION
+======================================== */
+
+.promo-section {
+  position: relative;
+  display: flex;
+  min-height: 330px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 65px;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #111;
+  color: white;
+}
+
+.promo-content {
+  position: relative;
+  z-index: 2;
+}
+
+.light-eyebrow {
+  color: #bdbdbd;
+}
+
+.promo-section h2 {
+  margin-top: 18px;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(40px, 5vw, 65px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -2px;
+}
+
+.promo-section p {
+  max-width: 400px;
+  margin-top: 15px;
+  margin-bottom: 25px;
+  color: #bdbdb5;
+  font-size: 13px;
+  line-height: 1.9;
+}
+
+.promo-button {
+  color: #111 !important;
+  font-weight: 900 !important;
+  transition: all 0.3s ease !important;
+}
+
+.promo-decoration {
+  position: absolute;
+  top: 50%;
+  right: 8%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--mike-accent);
+  opacity: 0.8;
+  transform: translateY(-50%);
+}
+
+.promo-decoration span {
+  font-family: "Outfit", sans-serif;
+  font-size: 65px;
+  font-weight: 900;
+  letter-spacing: -6px;
+}

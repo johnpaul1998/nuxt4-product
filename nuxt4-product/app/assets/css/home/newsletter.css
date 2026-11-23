@@ -1,0 +1,47 @@
+/* ========================================
+   NEWSLETTER
+======================================== */
+
+.newsletter-section {
+  padding: 25px 0;
+  background: #e8e9df;
+}
+
+.newsletter-section h2 {
+  margin-top: 18px;
+  font-family: "Outfit", sans-serif;
+  font-size: clamp(42px, 6vw, 67px);
+  font-weight: 900;
+  line-height: 0.95;
+  letter-spacing: -3px;
+}
+
+.newsletter-section p {
+  max-width: 400px;
+  margin-top: 18px;
+  color: #686960;
+  font-size: 13px;
+  line-height: 1.8;
+}
+
+.newsletter-form {
+  max-width: 500px;
+  margin-left: auto;
+}
+
+.newsletter-form :deep(.v-field) {
+  border-radius: 12px;
+  background: white;
+}
+
+.newsletter-form :deep(.v-btn) {
+  height: 53px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+
+.newsletter-form :deep(.v-btn:hover) {
+  transform: translateY(-3px);
+  background: #343a22 !important;
+}

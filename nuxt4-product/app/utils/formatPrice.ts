@@ -1,0 +1,6 @@
+export const formatPrice = (price: number): string => {
+  return new Intl.NumberFormat("en-PH", {
+    style: "currency",
+    currency: "PHP",
+  }).format(price || 0);
+}

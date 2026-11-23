@@ -1,0 +1,265 @@
+/* ========================================
+   CHECKOUT
+======================================== */
+
+.success-card .checkout-card{
+  overflow: hidden;
+  background: #f8f8f4;
+}
+
+.checkout-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 30px 35px;
+}
+
+.checkout-header p {
+  margin-top: 5px;
+  color: #888;
+  font-size: 12px;
+}
+
+.checkout-header h2 {
+  font-family: "Outfit", sans-serif;
+  font-weight: 900;
+  letter-spacing: -1.5px;
+}
+
+.checkout-body {
+  padding: 30px 35px !important;
+}
+
+.checkout-form-column {
+  padding-right: 35px;
+}
+
+.checkout-step {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin-bottom: 22px;
+}
+
+.checkout-step span {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #111;
+  color: white;
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.checkout-step h3 {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.checkout-form-column :deep(.v-field) {
+  background: white;
+}
+
+.payment-option {
+  padding: 13px;
+  border: 1px solid #e5e5df;
+  border-radius: 12px;
+  background: white;
+}
+
+.payment-label {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 5px;
+  color: #111;
+}
+
+.payment-label small .payment-label strong{
+  display: block;
+}
+
+.payment-label strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.payment-label small {
+  margin-top: 4px;
+  color: #888;
+  font-size: 10px;
+}
+
+.checkout-summary {
+  height: 100%;
+  padding: 25px;
+  border: 1px solid #e9e9e3;
+  border-radius: 15px;
+  background: white;
+}
+
+.checkout-summary-eyebrow {
+  color: #999;
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+}
+
+.checkout-summary > h3 {
+  margin-top: 7px;
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.7px;
+}
+
+.checkout-product {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.checkout-product-image {
+  display: flex;
+  width: 65px;
+  height: 75px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f0f0eb;
+}
+
+.checkout-product-info {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checkout-product-info strong {
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.checkout-product-info span {
+  color: #999;
+  font-size: 10px;
+}
+
+.checkout-product-total {
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.summary-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  color: #777;
+  font-size: 11px;
+}
+
+.summary-line strong {
+  color: #111;
+  text-align: right;
+}
+
+.checkout-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.checkout-total strong {
+  font-size: 23px;
+  letter-spacing: -1px;
+}
+
+.checkout-note {
+  margin-top: 15px;
+  color: #999;
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+.secure-checkout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 17px;
+  color: #999;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+/* ========================================
+   ORDER SUCCESS
+======================================== */
+
+.success-icon {
+  display: flex;
+  width: 85px;
+  height: 85px;
+  align-items: center;
+  justify-content: center;
+  margin: 35px auto 0;
+  border-radius: 50%;
+  background: #111;
+}
+
+.success-eyebrow {
+  color: #888;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.success-title {
+  color: #111;
+  font-family: "Outfit", sans-serif;
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -2px;
+}
+
+.success-message {
+  color: #777;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.order-reference {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px;
+  border-radius: 12px;
+  background: #eeeeea;
+}
+
+.order-reference span {
+  color: #888;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
+
+.order-reference strong {
+  color: #111;
+  font-size: 19px;
+  word-break: break-all;
+}

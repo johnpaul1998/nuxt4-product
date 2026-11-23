@@ -1,0 +1,49 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap");
+
+/* ========================================
+   THEME
+======================================== */
+
+.nike-style {
+  --mike-bg: #f4f4f0;
+  --mike-dark: #111;
+  --mike-accent: #c5ce8a;
+  --mike-muted: #888880;
+
+  min-height: 100vh;
+  background: var(--mike-bg);
+  color: var(--mike-dark);
+  font-family: "Inter", sans-serif;
+  letter-spacing: -0.2px;
+}
+
+.nike-style h1,
+.nike-style h2,
+.nike-style h3,
+.nike-style h4,
+
+.footer-logo .brand-logo{
+  font-family: "Outfit", sans-serif;
+  font-weight: 800;
+}
+
+
+.nike-style .v-btn .nike-style button{
+  font-family: "Inter", sans-serif;
+  font-weight: 700;
+}
+
+
+.nike-style textarea .nike-style input{
+  font-family: "Inter", sans-serif;
+}
+
+.announcement-bar {
+  padding: 9px;
+  background: var(--mike-dark);
+  color: white;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}

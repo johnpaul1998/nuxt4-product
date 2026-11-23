@@ -1,0 +1,132 @@
+/* ========================================
+   NAVBAR
+======================================== */
+
+.main-navbar {
+  position: sticky !important;
+  top: 0;
+  z-index: 1000;
+  border-bottom: 1px solid #e5e5df;
+  backdrop-filter: blur(14px);
+  transition: box-shadow 0.3s ease;
+}
+
+.main-navbar:hover {
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.04);
+}
+
+.navbar-container {
+  max-width: 1500px;
+  margin: 0 auto;
+}
+
+.brand-logo {
+  color: var(--mike-dark);
+  font-size: 40px;
+  font-weight: 900;
+  text-decoration: none;
+  letter-spacing: -3px;
+  transition: transform 0.3s ease;
+}
+
+.brand-logo:hover {
+  transform: scale(1.04);
+}
+
+.brand-logo span,
+.footer-logo span {
+  color: var(--mike-accent);
+}
+
+.desktop-navigation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.desktop-navigation :deep(.v-btn) {
+  position: relative;
+  font-size: 11px;
+  letter-spacing: 1.2px;
+}
+
+.desktop-navigation :deep(.v-btn::after) {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  content: "";
+  background: var(--mike-accent);
+  transform: translateX(-50%);
+  transition: width 0.3s ease;
+}
+
+.desktop-navigation :deep(.v-btn:hover::after) {
+  width: 55%;
+}
+
+.mobile-menu {
+  display: none;
+}
+
+/* ========================================
+   MOBILE MENU
+======================================== */
+
+.mobile-navigation {
+  background: var(--mike-bg);
+}
+
+.mobile-menu-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.mobile-menu-links {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.mobile-menu-links a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  border-bottom: 1px solid #deded8;
+  color: var(--mike-dark);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  text-decoration: none;
+}
+
+.mobile-cart-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px 0;
+  border: none;
+  background: transparent;
+  color: var(--mike-dark);
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  cursor: pointer;
+}
+
+.mobile-menu-footer {
+  padding: 20px;
+  border-top: 1px solid #deded8;
+  color: #888;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+}
